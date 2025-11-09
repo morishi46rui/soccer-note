@@ -1,0 +1,16 @@
+backend/node_modules
+backend/vendor
+backend/.env
+backend/.git
+backend/.gitignore
+backend/.gitattributes
+backend/storage/logs/*.log
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/bootstrap/cache/*
+.git
+.gitignore
+README.md
+docker-compose.yml
+.DS_Store
