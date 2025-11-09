@@ -151,7 +151,7 @@ copy-vendor:
 	@echo "==> コピーが完了しました"
 
 # フロントエンドシェル
-frontend-shell:
+f:
 	@docker-compose exec frontend sh
 
 # フロントエンドログ
