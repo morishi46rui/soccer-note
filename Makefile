@@ -25,6 +25,7 @@ help:
 	@echo "  make npm-dev      - npm run devを実行"
 	@echo "  make npm-build    - npm run buildを実行"
 	@echo "  make swagger      - Swaggerドキュメントを生成"
+	@echo "  make api          - API関連ファイルを自動生成(ルーティング・Swagger・型定義)"
 
 # 初回環境構築
 init:
@@ -169,3 +170,15 @@ swagger:
 	@docker-compose exec app php artisan l5-swagger:generate
 	@echo "==> ドキュメントが生成されました"
 	@echo "==> アクセス: http://localhost:8000/api/documentation"
+
+# API関連の自動生成
+api:
+	@echo "==> API関連ファイルを自動生成中..."
+	@echo "==> 1. ルーティングを自動生成..."
+	@php scripts/generate-routes.php
+	@echo "==> 2. Swaggerドキュメントを生成..."
+	@docker-compose exec app php artisan l5-swagger:generate
+	@echo "==> 3. TypeScript型定義を生成..."
+	@npx openapi-typescript backend/storage/api-docs/api-docs.json -o frontend/src/types/api.ts 2>/dev/null || echo "TypeScript型定義の生成をスキップ (openapi-typescriptが未インストール)"
+	@echo "==> API関連ファイルの生成が完了しました"
+	@echo "==> Swagger UI: http://localhost:8000/api/documentation"
