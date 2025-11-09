@@ -32,7 +32,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # Laravelプロジェクトのファイルをコンテナにコピー
-COPY backend /var/www/html/
+COPY . /var/www/html/
 
 # .envファイルが存在しない場合は.env.exampleからコピー
 RUN if [ ! -f .env ]; then cp .env.example .env; fi

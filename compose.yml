@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: soccer-note-app
     restart: unless-stopped
