@@ -1,4 +1,4 @@
-.PHONY: help init up down re build logs ps clean clean-deps install migrate seed fresh test shell db-shell
+.PHONY: help init up down re build logs ps clean clean-deps install migrate seed fresh test b db-shell npm-dev npm-build artisan composer npm copy-vendor f frontend-logs
 
 # デフォルトのターゲット
 .DEFAULT_GOAL := help
@@ -138,7 +138,11 @@ artisan:
 
 # Composerコマンド実行（使用例: make composer cmd="require package"）
 composer:
-	@docker-compose exec app composer $(cmd)
+	@docker-compose exec -u root app composer $(cmd)
+	@echo "==> composer.jsonとcomposer.lockをホストにコピー中..."
+	@docker cp soccer-note-app:/var/www/html/composer.json ./backend/composer.json
+	@docker cp soccer-note-app:/var/www/html/composer.lock ./backend/composer.lock
+	@echo "==> コピーが完了しました"
 
 # NPMコマンド実行（使用例: make npm cmd="install package"）
 npm:
@@ -151,7 +155,7 @@ copy-vendor:
 	@echo "==> コピーが完了しました"
 
 # フロントエンドシェル
-f:
+bashf:
 	@docker-compose exec frontend sh
 
 # フロントエンドログ
