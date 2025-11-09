@@ -149,3 +149,11 @@ copy-vendor:
 	@echo "==> vendorをホストにコピー中..."
 	@docker cp soccer-note-app:/var/www/html/vendor ./backend/vendor
 	@echo "==> コピーが完了しました"
+
+# フロントエンドシェル
+frontend-shell:
+	@docker-compose exec frontend sh
+
+# フロントエンドログ
+frontend-logs:
+	@docker-compose logs -f frontend
