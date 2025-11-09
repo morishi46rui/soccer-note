@@ -24,6 +24,7 @@ help:
 	@echo "  make db-shell     - PostgreSQLに接続"
 	@echo "  make npm-dev      - npm run devを実行"
 	@echo "  make npm-build    - npm run buildを実行"
+	@echo "  make swagger      - Swaggerドキュメントを生成"
 
 # 初回環境構築
 init:
@@ -84,9 +85,9 @@ clean-deps:
 # 依存関係インストール
 install:
 	@echo "==> Composer依存関係をインストール中..."
-	@docker-compose exec app composer install
+	@docker-compose exec -u root app composer install
 	@echo "==> NPM依存関係をインストール中..."
-	@docker-compose exec app npm install
+	@docker-compose exec -u root app npm install
 	@echo "==> 依存関係のインストールが完了しました"
 
 # マイグレーション
@@ -161,3 +162,10 @@ bashf:
 # フロントエンドログ
 frontend-logs:
 	@docker-compose logs -f frontend
+
+# Swaggerドキュメント生成
+swagger:
+	@echo "==> Swaggerドキュメントを生成中..."
+	@docker-compose exec app php artisan l5-swagger:generate
+	@echo "==> ドキュメントが生成されました"
+	@echo "==> アクセス: http://localhost:8000/api/documentation"

@@ -1,0 +1,63 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Soccer Note API",
+        "description": "サッカーノートアプリケーションのAPI仕様",
+        "contact": {
+            "email": "admin@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "開発環境"
+        }
+    ],
+    "paths": {
+        "/api/v1/health": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "ヘルスチェック",
+                "description": "APIサーバーの稼働状態を確認します",
+                "operationId": "getHealth",
+                "responses": {
+                    "200": {
+                        "description": "正常",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "required": [
+                                        "status",
+                                        "timestamp"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "description": "ステータス",
+                                            "type": "string",
+                                            "example": "ok"
+                                        },
+                                        "timestamp": {
+                                            "description": "タイムスタンプ",
+                                            "type": "string",
+                                            "example": "2025-01-10T12:00:00Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Health",
+            "description": "ヘルスチェック"
+        }
+    ]
+}

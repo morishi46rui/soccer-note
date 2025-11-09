@@ -7,7 +7,9 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
-      - app-data:/var/www/html
+      - ./backend:/var/www/html
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
     networks:
       - soccer-note-network
     depends_on:
@@ -21,7 +23,7 @@ services:
       - "8000:80"
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - app-data:/var/www/html
+      - ./backend:/var/www/html
     networks:
       - soccer-note-network
     depends_on:
@@ -64,6 +66,4 @@ networks:
 
 volumes:
   postgres-data:
-    driver: local
-  app-data:
     driver: local
