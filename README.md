@@ -2,6 +2,10 @@
 
 Laravelベースのサッカーノートアプリケーションです。
 
+- フロントエンド: http://localhost:5173
+- バックエンド: http://localhost:8000
+- Swagger UI: http://localhost:8000/api/documentation
+
 ## 必要な環境
 
 - Docker

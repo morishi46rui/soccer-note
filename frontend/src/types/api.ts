@@ -4,6 +4,126 @@
  */
 
 export interface paths {
+    "/api/v1/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * ユーザー登録
+         * @description 新規ユーザーを登録します
+         */
+        post: operations["register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * ログイン
+         * @description ユーザーログインしてトークンを発行します
+         */
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * ログアウト
+         * @description 現在のトークンを無効化します
+         */
+        post: operations["logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 認証ユーザー情報取得
+         * @description 現在認証されているユーザーの情報を取得します
+         */
+        get: operations["me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * プロフィール更新
+         * @description 認証ユーザーのプロフィール情報を更新します
+         */
+        put: operations["updateProfile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * パスワード変更
+         * @description 認証ユーザーのパスワードを変更します
+         */
+        put: operations["updatePassword"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -27,7 +147,132 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        LoginRequest: {
+            email: components["schemas"]["User"]["email"];
+            /**
+             * Format: password
+             * @example password123
+             */
+            password: string;
+            /** @example iPhone 15 */
+            device_name?: string;
+        };
+        RegisterRequest: {
+            name: components["schemas"]["User"]["name"];
+            email: components["schemas"]["User"]["email"];
+            /**
+             * Format: password
+             * @example password123
+             */
+            password: string;
+            /**
+             * Format: password
+             * @example password123
+             */
+            password_confirmation: string;
+        };
+        UpdatePasswordRequest: {
+            /**
+             * Format: password
+             * @example oldpassword
+             */
+            current_password: string;
+            /**
+             * Format: password
+             * @example newpassword123
+             */
+            password: string;
+            /**
+             * Format: password
+             * @example newpassword123
+             */
+            password_confirmation: string;
+        };
+        UpdateProfileRequest: {
+            name?: components["schemas"]["User"]["name"];
+            email?: components["schemas"]["User"]["email"];
+        };
+        User: {
+            /**
+             * Format: int64
+             * @description ユーザーID
+             */
+            id?: number;
+            /** @description ユーザー名 */
+            name?: string;
+            /**
+             * Format: email
+             * @description メールアドレス
+             */
+            email?: string;
+            /**
+             * Format: date-time
+             * @description メールアドレス確認日時
+             */
+            email_verified_at?: string | null;
+            /**
+             * Format: password
+             * @description パスワード
+             */
+            password?: string;
+            /** @description リメンバートークン */
+            remember_token?: string | null;
+            /**
+             * Format: date-time
+             * @description 作成日時
+             */
+            created_at?: string;
+            /**
+             * Format: date-time
+             * @description 更新日時
+             */
+            updated_at?: string;
+        };
+        GetProfileResponse: {
+            id?: components["schemas"]["User"]["id"];
+            name?: components["schemas"]["User"]["name"];
+            email?: components["schemas"]["User"]["email"];
+            email_verified_at?: components["schemas"]["User"]["email_verified_at"];
+            created_at?: components["schemas"]["User"]["created_at"];
+            updated_at?: components["schemas"]["User"]["updated_at"];
+        };
+        LoginResponse: {
+            /** @example 1|abcdefghijklmnopqrstuvwxyz */
+            token?: string;
+            user?: {
+                id?: components["schemas"]["User"]["id"];
+                name?: components["schemas"]["User"]["name"];
+                email?: components["schemas"]["User"]["email"];
+            };
+        };
+        LogoutResponse: {
+            /** @example ログアウトしました */
+            message?: string;
+        };
+        RegisterResponse: {
+            user?: {
+                id?: components["schemas"]["User"]["id"];
+                name?: components["schemas"]["User"]["name"];
+                email?: components["schemas"]["User"]["email"];
+                created_at?: components["schemas"]["User"]["created_at"];
+            };
+            /** @example 1|abcdefghijklmnopqrstuvwxyz */
+            token?: string;
+        };
+        UpdatePasswordResponse: {
+            /** @example パスワードを更新しました */
+            message?: string;
+        };
+        UpdateProfileResponse: {
+            id?: components["schemas"]["User"]["id"];
+            name?: components["schemas"]["User"]["name"];
+            email?: components["schemas"]["User"]["email"];
+            email_verified_at?: components["schemas"]["User"]["email_verified_at"];
+            created_at?: components["schemas"]["User"]["created_at"];
+            updated_at?: components["schemas"]["User"]["updated_at"];
+        };
+    };
     responses: never;
     parameters: never;
     requestBodies: never;
@@ -36,6 +281,198 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterRequest"];
+            };
+        };
+        responses: {
+            /** @description 登録成功 */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegisterResponse"];
+                };
+            };
+            /** @description バリデーションエラー */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description ログイン成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponse"];
+                };
+            };
+            /** @description 認証失敗 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description ログアウト成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogoutResponse"];
+                };
+            };
+            /** @description 認証エラー */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetProfileResponse"];
+                };
+            };
+            /** @description 認証エラー */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProfileRequest"];
+            };
+        };
+        responses: {
+            /** @description 更新成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateProfileResponse"];
+                };
+            };
+            /** @description 認証エラー */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description バリデーションエラー */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updatePassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description 更新成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdatePasswordResponse"];
+                };
+            };
+            /** @description 認証エラー */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description バリデーションエラー */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getHealth: {
         parameters: {
             query?: never;

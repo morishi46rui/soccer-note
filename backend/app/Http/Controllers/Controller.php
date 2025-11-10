@@ -16,6 +16,15 @@ use OpenApi\Attributes as OA;
     url: 'http://localhost:8000',
     description: '開発環境'
 )]
+#[OA\SecurityScheme(
+    securityScheme: 'sanctum',
+    type: 'http',
+    description: 'Laravel Sanctum認証トークン',
+    name: 'Authorization',
+    in: 'header',
+    scheme: 'bearer',
+    bearerFormat: 'Token'
+)]
 abstract class Controller
 {
     //

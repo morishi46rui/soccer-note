@@ -15,6 +15,222 @@
         }
     ],
     "paths": {
+        "/api/v1/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "ユーザー登録",
+                "description": "新規ユーザーを登録します",
+                "operationId": "register",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "登録成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegisterResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "バリデーションエラー"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "ログイン",
+                "description": "ユーザーログインしてトークンを発行します",
+                "operationId": "login",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "ログイン成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "認証失敗"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "ログアウト",
+                "description": "現在のトークンを無効化します",
+                "operationId": "logout",
+                "responses": {
+                    "200": {
+                        "description": "ログアウト成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LogoutResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "認証エラー"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "認証ユーザー情報取得",
+                "description": "現在認証されているユーザーの情報を取得します",
+                "operationId": "me",
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetProfileResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "認証エラー"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/profile": {
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "プロフィール更新",
+                "description": "認証ユーザーのプロフィール情報を更新します",
+                "operationId": "updateProfile",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "更新成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdateProfileResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "認証エラー"
+                    },
+                    "422": {
+                        "description": "バリデーションエラー"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/password": {
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "パスワード変更",
+                "description": "認証ユーザーのパスワードを変更します",
+                "operationId": "updatePassword",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "更新成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdatePasswordResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "認証エラー"
+                    },
+                    "422": {
+                        "description": "バリデーションエラー"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/health": {
             "get": {
                 "tags": [
@@ -54,7 +270,267 @@
             }
         }
     },
+    "components": {
+        "schemas": {
+            "LoginRequest": {
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "properties": {
+                    "email": {
+                        "$ref": "#/components/schemas/User/properties/email"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "password123"
+                    },
+                    "device_name": {
+                        "type": "string",
+                        "example": "iPhone 15"
+                    }
+                },
+                "type": "object"
+            },
+            "RegisterRequest": {
+                "required": [
+                    "name",
+                    "email",
+                    "password",
+                    "password_confirmation"
+                ],
+                "properties": {
+                    "name": {
+                        "$ref": "#/components/schemas/User/properties/name"
+                    },
+                    "email": {
+                        "$ref": "#/components/schemas/User/properties/email"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "password123"
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "password123"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdatePasswordRequest": {
+                "required": [
+                    "current_password",
+                    "password",
+                    "password_confirmation"
+                ],
+                "properties": {
+                    "current_password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "oldpassword"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "newpassword123"
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "newpassword123"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateProfileRequest": {
+                "properties": {
+                    "name": {
+                        "$ref": "#/components/schemas/User/properties/name"
+                    },
+                    "email": {
+                        "$ref": "#/components/schemas/User/properties/email"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "properties": {
+                    "id": {
+                        "description": "ユーザーID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "description": "ユーザー名",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "メールアドレス",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "email_verified_at": {
+                        "description": "メールアドレス確認日時",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "password": {
+                        "description": "パスワード",
+                        "type": "string",
+                        "format": "password"
+                    },
+                    "remember_token": {
+                        "description": "リメンバートークン",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "作成日時",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "更新日時",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "GetProfileResponse": {
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/User/properties/id"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/User/properties/name"
+                    },
+                    "email": {
+                        "$ref": "#/components/schemas/User/properties/email"
+                    },
+                    "email_verified_at": {
+                        "$ref": "#/components/schemas/User/properties/email_verified_at"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/User/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/User/properties/updated_at"
+                    }
+                },
+                "type": "object"
+            },
+            "LoginResponse": {
+                "properties": {
+                    "token": {
+                        "type": "string",
+                        "example": "1|abcdefghijklmnopqrstuvwxyz"
+                    },
+                    "user": {
+                        "properties": {
+                            "id": {
+                                "$ref": "#/components/schemas/User/properties/id"
+                            },
+                            "name": {
+                                "$ref": "#/components/schemas/User/properties/name"
+                            },
+                            "email": {
+                                "$ref": "#/components/schemas/User/properties/email"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "LogoutResponse": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "ログアウトしました"
+                    }
+                },
+                "type": "object"
+            },
+            "RegisterResponse": {
+                "properties": {
+                    "user": {
+                        "properties": {
+                            "id": {
+                                "$ref": "#/components/schemas/User/properties/id"
+                            },
+                            "name": {
+                                "$ref": "#/components/schemas/User/properties/name"
+                            },
+                            "email": {
+                                "$ref": "#/components/schemas/User/properties/email"
+                            },
+                            "created_at": {
+                                "$ref": "#/components/schemas/User/properties/created_at"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "token": {
+                        "type": "string",
+                        "example": "1|abcdefghijklmnopqrstuvwxyz"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdatePasswordResponse": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "パスワードを更新しました"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateProfileResponse": {
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/User/properties/id"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/User/properties/name"
+                    },
+                    "email": {
+                        "$ref": "#/components/schemas/User/properties/email"
+                    },
+                    "email_verified_at": {
+                        "$ref": "#/components/schemas/User/properties/email_verified_at"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/User/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/User/properties/updated_at"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "description": "Laravel Sanctum認証トークン",
+                "name": "Authorization",
+                "in": "header",
+                "bearerFormat": "Token",
+                "scheme": "bearer"
+            }
+        }
+    },
     "tags": [
+        {
+            "name": "Auth",
+            "description": "認証"
+        },
         {
             "name": "Health",
             "description": "ヘルスチェック"
