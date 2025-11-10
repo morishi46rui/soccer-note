@@ -16,33 +16,29 @@ foreach ($controllers as $controllerFile) {
     $className = basename($controllerFile, '.php');
     $content = file_get_contents($controllerFile);
 
-    // OA\Get, OA\Post などのHTTPメソッドを抽出
-    preg_match_all('/#\[OA\\\\(Get|Post|Put|Delete|Patch)\(/', $content, $matches);
+    $useStatement = "use App\\Http\\Controllers\\Api\\V1\\{$className}";
 
-    if (!empty($matches[1])) {
-        $useStatement = "use App\\Http\\Controllers\\Api\\V1\\{$className};";
+    // #[OA\(メソッド名)で始まるブロックを全て見つける
+    if (!preg_match_all('/#\[OA\\\\(Get|Post|Put|Delete|Patch)\(.*?path:\s*[\'"]\/api\/v1\/([^\'\"]+)[\'"].*?\)]\s*(?:#\[[^\]]+\]\s*)*public\s+function\s+(\w+)/s', $content, $matches, PREG_SET_ORDER)) {
+        continue;
+    }
 
-        foreach ($matches[1] as $method) {
-            // パスを抽出
-            if (preg_match('/path:\s*[\'"]\/api\/v1\/([^\'"]+)[\'"]/', $content, $pathMatch)) {
-                $path = $pathMatch[1];
-                $httpMethod = strtolower($method);
-                $methodName = 'index'; // デフォルト
+    foreach ($matches as $match) {
+        $httpMethod = strtolower($match[1]);
+        $path = $match[2];
+        $methodName = $match[3];
 
-                // メソッド名を推測
-                if ($httpMethod === 'post') $methodName = 'store';
-                elseif ($httpMethod === 'put' || $httpMethod === 'patch') $methodName = 'update';
-                elseif ($httpMethod === 'delete') $methodName = 'destroy';
+        // このマッチ全体からsecurityを探す
+        $requiresAuth = (bool)preg_match('/security:\s*\[\[/', $match[0]);
 
-                $routes[] = [
-                    'use' => $useStatement,
-                    'method' => $httpMethod,
-                    'path' => $path,
-                    'controller' => $className,
-                    'action' => $methodName
-                ];
-            }
-        }
+        $routes[] = [
+            'use' => $useStatement,
+            'method' => $httpMethod,
+            'path' => $path,
+            'controller' => $className,
+            'action' => $methodName,
+            'requiresAuth' => $requiresAuth
+        ];
     }
 }
 
@@ -52,14 +48,29 @@ $output = "<?php\n\n";
 // use文を追加
 $uses = array_unique(array_column($routes, 'use'));
 foreach ($uses as $use) {
-    $output .= "$use\n";
+    $output .= "$use;\n";
 }
 
 $output .= "use Illuminate\\Support\\Facades\\Route;\n\n";
 $output .= "Route::prefix('v1')->group(function () {\n";
 
-foreach ($routes as $route) {
+// 認証不要なルートと認証必要なルートを分ける
+$publicRoutes = array_filter($routes, fn($r) => !$r['requiresAuth']);
+$protectedRoutes = array_filter($routes, fn($r) => $r['requiresAuth']);
+
+// 認証不要なルート
+foreach ($publicRoutes as $route) {
     $output .= "    Route::{$route['method']}('/{$route['path']}', [{$route['controller']}::class, '{$route['action']}']);\n";
+}
+
+// 認証必要なルート
+if (!empty($protectedRoutes)) {
+    $output .= "\n    // Sanctum認証が必要なエンドポイント\n";
+    $output .= "    Route::middleware('auth:sanctum')->group(function () {\n";
+    foreach ($protectedRoutes as $route) {
+        $output .= "        Route::{$route['method']}('/{$route['path']}', [{$route['controller']}::class, '{$route['action']}']);\n";
+    }
+    $output .= "    });\n";
 }
 
 $output .= "});\n";
@@ -68,3 +79,5 @@ file_put_contents($routesPath, $output);
 
 echo "✓ ルーティングファイルを生成しました\n";
 echo "✓ " . count($routes) . "個のルートを追加しました\n";
+echo "  - 認証不要: " . count($publicRoutes) . "個\n";
+echo "  - 認証必要: " . count($protectedRoutes) . "個\n";
