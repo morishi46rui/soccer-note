@@ -1,35 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import {
+  Box,
+  Button,
+  Container,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Container maxWidth="sm">
+      <Stack spacing={4} py={8}>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <SportsSoccerIcon color="primary" fontSize="large" />
+          <Box>
+            <Typography component="h1" variant="h4" fontWeight="bold">
+              Soccer Note
+            </Typography>
+            <Typography color="text.secondary">
+              React + MUI スタイルのスターティングポイント
+            </Typography>
+          </Box>
+        </Stack>
+
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Stack spacing={2}>
+            <Typography>
+              サンプルカウンターを使ってコンポーネントのつながりを確認できるよ。
+            </Typography>
+            <Typography variant="h5" fontWeight="medium">
+              カウント: {count}
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => setCount((prev) => prev + 1)}
+            >
+              1増やす
+            </Button>
+          </Stack>
+        </Paper>
+      </Stack>
+    </Container>
+  );
 }
 
-export default App
+export default App;
