@@ -1,24 +1,33 @@
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import { Box, Container, Stack, Typography } from "@mui/material";
-import { CounterFeature } from "../../features/counter/counter-feature";
+import { Container, Stack, Typography } from "@mui/material";
+import { LoginFeature } from "../../features/auth/login/login-feature";
 
 export const RootRoute = () => {
   return (
-    <Container maxWidth="sm">
-      <Stack spacing={4} py={8}>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <SportsSoccerIcon color="primary" fontSize="large" />
-          <Box>
-            <Typography component="h1" variant="h4" fontWeight="bold">
-              Soccer Note
-            </Typography>
-            <Typography color="text.secondary">
-              React + MUI スタイルのスターティングポイント
-            </Typography>
-          </Box>
+    <Container
+      maxWidth="md"
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Stack spacing={5}>
+        <Stack spacing={1} alignItems="center" textAlign="center">
+          <Typography
+            component="h1"
+            variant="h4"
+            fontWeight="bold"
+            display="inline-flex"
+            alignItems="center"
+            gap={1}
+          >
+            Soccer Note
+            <SportsSoccerIcon color="primary" fontSize="large" />
+          </Typography>
         </Stack>
-
-        <CounterFeature />
+        <LoginFeature />
       </Stack>
     </Container>
   );
