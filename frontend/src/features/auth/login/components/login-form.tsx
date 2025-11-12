@@ -1,3 +1,5 @@
+"use client";
+
 import GoogleIcon from "@mui/icons-material/Google";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -24,6 +26,7 @@ export const LoginForm = () => {
     values,
     errors,
     status,
+    errorMessage,
     isSubmitting,
     isSubmitDisabled,
     handleEmailChange,
@@ -151,7 +154,13 @@ export const LoginForm = () => {
 
         <Collapse in={status === "success"}>
           <Alert onClose={dismissStatus} severity="success" variant="outlined">
-            ダミーログインに成功したよ。実際のAPI接続は後で行おう。
+            ログインに成功しました！
+          </Alert>
+        </Collapse>
+
+        <Collapse in={status === "error"}>
+          <Alert onClose={dismissStatus} severity="error" variant="outlined">
+            {errorMessage || "ログインに失敗しました"}
           </Alert>
         </Collapse>
       </Stack>

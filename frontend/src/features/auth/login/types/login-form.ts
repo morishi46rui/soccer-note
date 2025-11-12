@@ -1,12 +1,12 @@
 export type LoginFormValues = {
-  email: string
-  password: string
-  staySignedIn: boolean
-}
+  email: string;
+  password: string;
+  staySignedIn: boolean;
+};
 
 export type LoginFormErrors = {
-  email?: string
-  password?: string
-}
+  email?: string;
+  password?: string;
+};
 
-export type LoginFormStatus = 'idle' | 'submitting' | 'success'
+export type LoginFormStatus = "idle" | "submitting" | "success" | "error";

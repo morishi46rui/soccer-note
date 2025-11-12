@@ -36,14 +36,14 @@ services:
     container_name: soccer-note-frontend
     restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "3000:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
     networks:
       - soccer-note-network
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 
   db:
     image: postgres:16-alpine

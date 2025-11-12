@@ -228,6 +228,11 @@ export interface components {
              * @description 更新日時
              */
             updated_at?: string;
+            /**
+             * Format: date-time
+             * @description 論理削除日時
+             */
+            deleted_at?: string | null;
         };
         GetProfileResponse: {
             id?: components["schemas"]["User"]["id"];
