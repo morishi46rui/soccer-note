@@ -50,12 +50,14 @@ RUN npm install
 RUN npm run build
 
 # 権限の設定
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/.env
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/.env /var/www/html/vendor /var/www/html/node_modules
 
-# www-dataユーザーに切り替え
-USER www-data
+# エントリーポイントを設定
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # ポート9000を公開
 EXPOSE 9000
 
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["php-fpm"]

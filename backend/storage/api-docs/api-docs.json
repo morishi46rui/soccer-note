@@ -397,6 +397,12 @@
                         "description": "更新日時",
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "deleted_at": {
+                        "description": "論理削除日時",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
                     }
                 },
                 "type": "object"
