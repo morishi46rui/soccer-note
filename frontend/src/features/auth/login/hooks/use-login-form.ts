@@ -1,6 +1,7 @@
 "use client";
 
 import { ApiError } from "@/lib/api-client";
+import { useRouter } from "next/navigation";
 import type { ChangeEvent, FormEvent } from "react";
 import { useCallback, useMemo, useState } from "react";
 import { useLoginMutation } from "../api/login";
@@ -59,6 +60,7 @@ export const useLoginForm = () => {
   const [errors, setErrors] = useState<LoginFormErrors>({});
   const [status, setStatus] = useState<LoginFormStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const router = useRouter();
 
   const loginMutation = useLoginMutation();
 
@@ -123,6 +125,9 @@ export const useLoginForm = () => {
         {
           onSuccess: () => {
             setStatus("success");
+            setTimeout(() => {
+              router.push("/dashboard");
+            }, 1000);
           },
           onError: (error) => {
             setStatus("error");
@@ -145,7 +150,7 @@ export const useLoginForm = () => {
         }
       );
     },
-    [values, loginMutation]
+    [values, loginMutation, router]
   );
 
   const isSubmitting = status === "submitting" || loginMutation.isPending;
