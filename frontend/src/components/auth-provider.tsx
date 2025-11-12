@@ -3,46 +3,44 @@
 import { AuthContext } from "@/hooks/use-auth";
 import type { User } from "@/types/auth";
 import type { PropsWithChildren } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-export function AuthProvider({ children }: PropsWithChildren) {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+const getInitialAuthState = () => {
+  if (typeof window === "undefined") {
+    return { user: null, token: null };
+  }
 
-  useEffect(() => {
-    const authToken = localStorage.getItem("auth_token");
-    const userJson = localStorage.getItem("user");
+  const authToken = localStorage.getItem("auth_token");
+  const userJson = localStorage.getItem("user");
 
-    if (authToken) {
-      setToken(authToken);
+  let user: User | null = null;
+  if (userJson) {
+    try {
+      user = JSON.parse(userJson);
+    } catch (error) {
+      console.error("Failed to parse user data:", error);
     }
+  }
 
-    if (userJson) {
-      try {
-        setUser(JSON.parse(userJson));
-      } catch (error) {
-        console.error("Failed to parse user data:", error);
-      }
-    }
+  return { user, token: authToken };
+};
 
-    setIsLoading(false);
-  }, []);
+export const AuthProvider = ({ children }: PropsWithChildren) => {
+  const [{ user, token }, setAuthState] = useState(getInitialAuthState);
 
   const logout = () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("user");
-    setToken(null);
-    setUser(null);
+    setAuthState({ user: null, token: null });
   };
 
   const value = {
     user,
     token,
     isAuthenticated: !!token,
-    isLoading,
+    isLoading: false,
     logout,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
+};
