@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasSqid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -13,6 +14,7 @@ use OpenApi\Attributes as OA;
     schema: 'User',
     properties: [
         new OA\Property(property: 'id', type: 'integer', format: 'int64', description: 'ユーザーID'),
+        new OA\Property(property: 'sqid', type: 'string', description: 'Sqid (公開用ID)', example: 'xYz34WvU'),
         new OA\Property(property: 'name', type: 'string', description: 'ユーザー名'),
         new OA\Property(property: 'email', type: 'string', format: 'email', description: 'メールアドレス'),
         new OA\Property(property: 'email_verified_at', type: 'string', format: 'date-time', nullable: true, description: 'メールアドレス確認日時'),
@@ -26,7 +28,7 @@ use OpenApi\Attributes as OA;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, HasSqid, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -37,6 +39,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+    ];
+
+    protected $appends = [
+        'sqid',
     ];
 
     protected function casts(): array

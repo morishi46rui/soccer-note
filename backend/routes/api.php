@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\NoteController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -15,5 +16,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
         Route::put('/auth/password', [AuthController::class, 'updatePassword']);
+        Route::get('/notes', [NoteController::class, 'index']);
+        Route::post('/notes', [NoteController::class, 'store']);
+        Route::get('/notes/{id}', [NoteController::class, 'show']);
+        Route::put('/notes/{id}', [NoteController::class, 'update']);
+        Route::delete('/notes/{id}', [NoteController::class, 'destroy']);
     });
 });

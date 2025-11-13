@@ -268,6 +268,219 @@
                     }
                 }
             }
+        },
+        "/api/v1/notes": {
+            "get": {
+                "tags": [
+                    "Notes"
+                ],
+                "summary": "ノート一覧取得",
+                "description": "ログインユーザーのノート一覧を取得します",
+                "operationId": "getNotes",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/per_page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "取得成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetNotesResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Notes"
+                ],
+                "summary": "ノート作成",
+                "description": "新しいノートを作成します",
+                "operationId": "createNote",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateNoteRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "作成成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateNoteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/notes/{id}": {
+            "get": {
+                "tags": [
+                    "Notes"
+                ],
+                "summary": "ノート詳細取得",
+                "description": "指定されたIDのノート詳細を取得します",
+                "operationId": "getNote",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ノートID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "取得成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetNoteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Notes"
+                ],
+                "summary": "ノート更新",
+                "description": "指定されたIDのノートを更新します",
+                "operationId": "updateNote",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ノートID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateNoteRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "更新成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdateNoteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Notes"
+                ],
+                "summary": "ノート削除",
+                "description": "指定されたIDのノートを削除します",
+                "operationId": "deleteNote",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ノートID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "削除成功"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -352,6 +565,88 @@
                     },
                     "email": {
                         "$ref": "#/components/schemas/User/properties/email"
+                    }
+                },
+                "type": "object"
+            },
+            "CreateNoteRequest": {
+                "required": [
+                    "title",
+                    "date",
+                    "content"
+                ],
+                "properties": {
+                    "title": {
+                        "$ref": "#/components/schemas/Note/properties/title"
+                    },
+                    "date": {
+                        "$ref": "#/components/schemas/Note/properties/date"
+                    },
+                    "content": {
+                        "$ref": "#/components/schemas/Note/properties/content"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateNoteRequest": {
+                "required": [
+                    "title",
+                    "date",
+                    "content"
+                ],
+                "properties": {
+                    "title": {
+                        "$ref": "#/components/schemas/Note/properties/title"
+                    },
+                    "date": {
+                        "$ref": "#/components/schemas/Note/properties/date"
+                    },
+                    "content": {
+                        "$ref": "#/components/schemas/Note/properties/content"
+                    }
+                },
+                "type": "object"
+            },
+            "Note": {
+                "properties": {
+                    "id": {
+                        "description": "ノートID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "user_id": {
+                        "description": "ユーザーID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "title": {
+                        "description": "タイトル",
+                        "type": "string"
+                    },
+                    "date": {
+                        "description": "日付",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "content": {
+                        "description": "内容",
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "description": "作成日時",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "更新日時",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "deleted_at": {
+                        "description": "論理削除日時",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -519,6 +814,221 @@
                     }
                 },
                 "type": "object"
+            },
+            "CreateNoteResponse": {
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/Note/properties/id"
+                    },
+                    "user_id": {
+                        "$ref": "#/components/schemas/Note/properties/user_id"
+                    },
+                    "title": {
+                        "$ref": "#/components/schemas/Note/properties/title"
+                    },
+                    "date": {
+                        "$ref": "#/components/schemas/Note/properties/date"
+                    },
+                    "content": {
+                        "$ref": "#/components/schemas/Note/properties/content"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/Note/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/Note/properties/updated_at"
+                    }
+                },
+                "type": "object"
+            },
+            "GetNoteResponse": {
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/Note/properties/id"
+                    },
+                    "user_id": {
+                        "$ref": "#/components/schemas/Note/properties/user_id"
+                    },
+                    "title": {
+                        "$ref": "#/components/schemas/Note/properties/title"
+                    },
+                    "date": {
+                        "$ref": "#/components/schemas/Note/properties/date"
+                    },
+                    "content": {
+                        "$ref": "#/components/schemas/Note/properties/content"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/Note/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/Note/properties/updated_at"
+                    }
+                },
+                "type": "object"
+            },
+            "GetNotesResponse": {
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "$ref": "#/components/schemas/Note/properties/id"
+                                },
+                                "user_id": {
+                                    "$ref": "#/components/schemas/Note/properties/user_id"
+                                },
+                                "title": {
+                                    "$ref": "#/components/schemas/Note/properties/title"
+                                },
+                                "date": {
+                                    "$ref": "#/components/schemas/Note/properties/date"
+                                },
+                                "content": {
+                                    "$ref": "#/components/schemas/Note/properties/content"
+                                },
+                                "created_at": {
+                                    "$ref": "#/components/schemas/Note/properties/created_at"
+                                },
+                                "updated_at": {
+                                    "$ref": "#/components/schemas/Note/properties/updated_at"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 72
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateNoteResponse": {
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/Note/properties/id"
+                    },
+                    "user_id": {
+                        "$ref": "#/components/schemas/Note/properties/user_id"
+                    },
+                    "title": {
+                        "$ref": "#/components/schemas/Note/properties/title"
+                    },
+                    "date": {
+                        "$ref": "#/components/schemas/Note/properties/date"
+                    },
+                    "content": {
+                        "$ref": "#/components/schemas/Note/properties/content"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/Note/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/Note/properties/updated_at"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "responses": {
+            "401": {
+                "description": "認証エラー",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "認証に失敗しました"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "404": {
+                "description": "リソースが見つかりません",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "リソースが見つかりません"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "422": {
+                "description": "バリデーションエラー",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "The given data was invalid."
+                                },
+                                "errors": {
+                                    "type": "object",
+                                    "example": {
+                                        "email": [
+                                            "メールアドレスは必須です。"
+                                        ],
+                                        "password": [
+                                            "パスワードは必須です。"
+                                        ]
+                                    },
+                                    "additionalProperties": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "parameters": {
+            "page": {
+                "name": "page",
+                "in": "query",
+                "description": "ページ番号",
+                "schema": {
+                    "type": "integer",
+                    "default": 1
+                }
+            },
+            "per_page": {
+                "name": "per_page",
+                "in": "query",
+                "description": "1ページあたりの件数",
+                "schema": {
+                    "type": "integer",
+                    "default": 15
+                }
             }
         },
         "securitySchemes": {
@@ -540,6 +1050,10 @@
         {
             "name": "Health",
             "description": "ヘルスチェック"
+        },
+        {
+            "name": "Notes",
+            "description": "ノート管理"
         }
     ]
 }

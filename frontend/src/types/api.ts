@@ -144,6 +144,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * ノート一覧取得
+         * @description ログインユーザーのノート一覧を取得します
+         */
+        get: operations["getNotes"];
+        put?: never;
+        /**
+         * ノート作成
+         * @description 新しいノートを作成します
+         */
+        post: operations["createNote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * ノート詳細取得
+         * @description 指定されたIDのノート詳細を取得します
+         */
+        get: operations["getNote"];
+        /**
+         * ノート更新
+         * @description 指定されたIDのノートを更新します
+         */
+        put: operations["updateNote"];
+        post?: never;
+        /**
+         * ノート削除
+         * @description 指定されたIDのノートを削除します
+         */
+        delete: operations["deleteNote"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -192,6 +244,52 @@ export interface components {
         UpdateProfileRequest: {
             name?: components["schemas"]["User"]["name"];
             email?: components["schemas"]["User"]["email"];
+        };
+        CreateNoteRequest: {
+            title: components["schemas"]["Note"]["title"];
+            date: components["schemas"]["Note"]["date"];
+            content: components["schemas"]["Note"]["content"];
+        };
+        UpdateNoteRequest: {
+            title: components["schemas"]["Note"]["title"];
+            date: components["schemas"]["Note"]["date"];
+            content: components["schemas"]["Note"]["content"];
+        };
+        Note: {
+            /**
+             * Format: int64
+             * @description ノートID
+             */
+            id?: number;
+            /**
+             * Format: int64
+             * @description ユーザーID
+             */
+            user_id?: number;
+            /** @description タイトル */
+            title?: string;
+            /**
+             * Format: date
+             * @description 日付
+             */
+            date?: string;
+            /** @description 内容 */
+            content?: string;
+            /**
+             * Format: date-time
+             * @description 作成日時
+             */
+            created_at?: string;
+            /**
+             * Format: date-time
+             * @description 更新日時
+             */
+            updated_at?: string;
+            /**
+             * Format: date-time
+             * @description 論理削除日時
+             */
+            deleted_at?: string | null;
         };
         User: {
             /**
@@ -277,9 +375,110 @@ export interface components {
             created_at?: components["schemas"]["User"]["created_at"];
             updated_at?: components["schemas"]["User"]["updated_at"];
         };
+        CreateNoteResponse: {
+            id?: components["schemas"]["Note"]["id"];
+            user_id?: components["schemas"]["Note"]["user_id"];
+            title?: components["schemas"]["Note"]["title"];
+            date?: components["schemas"]["Note"]["date"];
+            content?: components["schemas"]["Note"]["content"];
+            created_at?: components["schemas"]["Note"]["created_at"];
+            updated_at?: components["schemas"]["Note"]["updated_at"];
+        };
+        GetNoteResponse: {
+            id?: components["schemas"]["Note"]["id"];
+            user_id?: components["schemas"]["Note"]["user_id"];
+            title?: components["schemas"]["Note"]["title"];
+            date?: components["schemas"]["Note"]["date"];
+            content?: components["schemas"]["Note"]["content"];
+            created_at?: components["schemas"]["Note"]["created_at"];
+            updated_at?: components["schemas"]["Note"]["updated_at"];
+        };
+        GetNotesResponse: {
+            data?: {
+                id?: components["schemas"]["Note"]["id"];
+                user_id?: components["schemas"]["Note"]["user_id"];
+                title?: components["schemas"]["Note"]["title"];
+                date?: components["schemas"]["Note"]["date"];
+                content?: components["schemas"]["Note"]["content"];
+                created_at?: components["schemas"]["Note"]["created_at"];
+                updated_at?: components["schemas"]["Note"]["updated_at"];
+            }[];
+            /** @example 1 */
+            current_page?: number;
+            /** @example 5 */
+            last_page?: number;
+            /** @example 15 */
+            per_page?: number;
+            /** @example 72 */
+            total?: number;
+        };
+        UpdateNoteResponse: {
+            id?: components["schemas"]["Note"]["id"];
+            user_id?: components["schemas"]["Note"]["user_id"];
+            title?: components["schemas"]["Note"]["title"];
+            date?: components["schemas"]["Note"]["date"];
+            content?: components["schemas"]["Note"]["content"];
+            created_at?: components["schemas"]["Note"]["created_at"];
+            updated_at?: components["schemas"]["Note"]["updated_at"];
+        };
     };
-    responses: never;
-    parameters: never;
+    responses: {
+        /** @description 認証エラー */
+        401: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    /** @example 認証に失敗しました */
+                    message?: string;
+                };
+            };
+        };
+        /** @description リソースが見つかりません */
+        404: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    /** @example リソースが見つかりません */
+                    message?: string;
+                };
+            };
+        };
+        /** @description バリデーションエラー */
+        422: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    /** @example The given data was invalid. */
+                    message?: string;
+                    /**
+                     * @example {
+                     *       "email": [
+                     *         "メールアドレスは必須です。"
+                     *       ],
+                     *       "password": [
+                     *         "パスワードは必須です。"
+                     *       ]
+                     *     }
+                     */
+                    errors?: {
+                        [key: string]: string[];
+                    };
+                };
+            };
+        };
+    };
+    parameters: {
+        /** @description ページ番号 */
+        page: number;
+        /** @description 1ページあたりの件数 */
+        per_page: number;
+    };
     requestBodies: never;
     headers: never;
     pathItems: never;
@@ -507,6 +706,136 @@ export interface operations {
                     };
                 };
             };
+        };
+    };
+    getNotes: {
+        parameters: {
+            query?: {
+                /** @description ページ番号 */
+                page?: components["parameters"]["page"];
+                /** @description 1ページあたりの件数 */
+                per_page?: components["parameters"]["per_page"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 取得成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetNotesResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+        };
+    };
+    createNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateNoteRequest"];
+            };
+        };
+        responses: {
+            /** @description 作成成功 */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateNoteResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            422: components["responses"]["422"];
+        };
+    };
+    getNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ノートID */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 取得成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetNoteResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+        };
+    };
+    updateNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ノートID */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateNoteRequest"];
+            };
+        };
+        responses: {
+            /** @description 更新成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateNoteResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            422: components["responses"]["422"];
+        };
+    };
+    deleteNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ノートID */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 削除成功 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
         };
     };
 }

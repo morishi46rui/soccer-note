@@ -123,4 +123,18 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Sqids Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Sqids configuration for generating YouTube-like IDs from integers.
+    | alphabet: Characters to use for ID generation
+    | min_length: Minimum length of generated IDs
+    |
+    */
+
+    'sqids_alphabet' => env('SQIDS_ALPHABET', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'),
+    'sqids_min_length' => env('SQIDS_MIN_LENGTH', 8),
+
 ];
