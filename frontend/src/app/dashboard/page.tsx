@@ -1,63 +1,131 @@
 "use client";
 
-import { useAuth } from "@/hooks/use-auth";
-import { Button, Container, Paper, Stack, Typography } from "@mui/material";
+import { DashboardLayout } from "@/components/dashboard-layout";
+import {
+  Add as AddIcon,
+  Description as DescriptionIcon,
+} from "@mui/icons-material";
+import { Box, Card, CardActionArea, Stack, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-    router.push("/");
-  };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 8 }}>
-      <Stack spacing={4}>
-        <Paper sx={{ p: 4 }}>
-          <Stack spacing={3}>
-            <Typography variant="h4" component="h1" fontWeight="bold">
+    <DashboardLayout>
+      <Box sx={{ p: 4 }}>
+        <Stack spacing={4}>
+          {/* Header */}
+          <Box>
+            <Typography
+              variant="h4"
+              component="h1"
+              fontWeight="bold"
+              gutterBottom
+            >
               ダッシュボード
             </Typography>
+          </Box>
 
-            {user && (
-              <Stack spacing={1}>
-                <Typography variant="h6">
-                  ようこそ、{user.name}さん！
-                </Typography>
-                <Typography color="text.secondary">
-                  メール: {user.email}
-                </Typography>
-              </Stack>
-            )}
-
-            <Button
-              variant="outlined"
-              onClick={handleLogout}
-              sx={{ alignSelf: "flex-start" }}
-            >
-              ログアウト
-            </Button>
-          </Stack>
-        </Paper>
-
-        <Paper sx={{ p: 4 }}>
-          <Stack spacing={2}>
+          {/* Quick Actions */}
+          <Box>
             <Typography variant="h6" gutterBottom>
-              サッカーノート
+              クイックアクション
             </Typography>
-            <Button
-              variant="contained"
-              onClick={() => router.push("/dashboard/notes")}
-              sx={{ alignSelf: "flex-start" }}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(2, 1fr)",
+                  md: "repeat(3, 1fr)",
+                },
+                gap: 2,
+              }}
             >
-              ノート一覧を見る
-            </Button>
-          </Stack>
-        </Paper>
-      </Stack>
-    </Container>
+              <Card
+                elevation={0}
+                sx={{
+                  border: 1,
+                  borderColor: "divider",
+                  "&:hover": {
+                    borderColor: "primary.main",
+                    backgroundColor: "action.hover",
+                  },
+                }}
+              >
+                <CardActionArea
+                  onClick={() => router.push("/dashboard/notes/new")}
+                  sx={{ p: 3 }}
+                >
+                  <Stack spacing={2} alignItems="center">
+                    <AddIcon sx={{ fontSize: 40, color: "primary.main" }} />
+                    <Typography variant="h6">新しいノート</Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      textAlign="center"
+                    >
+                      サッカーノートを作成
+                    </Typography>
+                  </Stack>
+                </CardActionArea>
+              </Card>
+
+              <Card
+                elevation={0}
+                sx={{
+                  border: 1,
+                  borderColor: "divider",
+                  "&:hover": {
+                    borderColor: "primary.main",
+                    backgroundColor: "action.hover",
+                  },
+                }}
+              >
+                <CardActionArea
+                  onClick={() => router.push("/dashboard/notes")}
+                  sx={{ p: 3 }}
+                >
+                  <Stack spacing={2} alignItems="center">
+                    <DescriptionIcon
+                      sx={{ fontSize: 40, color: "primary.main" }}
+                    />
+                    <Typography variant="h6">ノート一覧</Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      textAlign="center"
+                    >
+                      すべてのノートを表示
+                    </Typography>
+                  </Stack>
+                </CardActionArea>
+              </Card>
+            </Box>
+          </Box>
+
+          {/* Recent Activity */}
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              最近のアクティビティ
+            </Typography>
+            <Card
+              elevation={0}
+              sx={{
+                border: 1,
+                borderColor: "divider",
+                p: 4,
+                textAlign: "center",
+              }}
+            >
+              <Typography color="text.secondary">
+                アクティビティはまだありません
+              </Typography>
+            </Card>
+          </Box>
+        </Stack>
+      </Box>
+    </DashboardLayout>
   );
 }
