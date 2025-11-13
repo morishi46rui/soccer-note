@@ -177,18 +177,18 @@ export interface paths {
         };
         /**
          * ノート詳細取得
-         * @description 指定されたIDのノート詳細を取得します
+         * @description 指定されたSqidまたはIDのノート詳細を取得します
          */
         get: operations["getNote"];
         /**
          * ノート更新
-         * @description 指定されたIDのノートを更新します
+         * @description 指定されたSqidまたはIDのノートを更新します
          */
         put: operations["updateNote"];
         post?: never;
         /**
          * ノート削除
-         * @description 指定されたIDのノートを削除します
+         * @description 指定されたSqidまたはIDのノートを削除します
          */
         delete: operations["deleteNote"];
         options?: never;
@@ -262,6 +262,11 @@ export interface components {
              */
             id?: number;
             /**
+             * @description Sqid (公開用ID)
+             * @example aBc12DeF
+             */
+            sqid?: string;
+            /**
              * Format: int64
              * @description ユーザーID
              */
@@ -297,6 +302,11 @@ export interface components {
              * @description ユーザーID
              */
             id?: number;
+            /**
+             * @description Sqid (公開用ID)
+             * @example xYz34WvU
+             */
+            sqid?: string;
             /** @description ユーザー名 */
             name?: string;
             /**
@@ -396,6 +406,7 @@ export interface components {
         GetNotesResponse: {
             data?: {
                 id?: components["schemas"]["Note"]["id"];
+                sqid?: components["schemas"]["Note"]["sqid"];
                 user_id?: components["schemas"]["Note"]["user_id"];
                 title?: components["schemas"]["Note"]["title"];
                 date?: components["schemas"]["Note"]["date"];
@@ -765,8 +776,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description ノートID */
-                id: number;
+                /** @description ノートSqidまたはID */
+                id: string;
             };
             cookie?: never;
         };
@@ -790,8 +801,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description ノートID */
-                id: number;
+                /** @description ノートSqidまたはID */
+                id: string;
             };
             cookie?: never;
         };
@@ -820,8 +831,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description ノートID */
-                id: number;
+                /** @description ノートSqidまたはID */
+                id: string;
             };
             cookie?: never;
         };

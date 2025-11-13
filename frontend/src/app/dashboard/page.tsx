@@ -44,12 +44,18 @@ export default function DashboardPage() {
         </Paper>
 
         <Paper sx={{ p: 4 }}>
-          <Typography variant="h6" gutterBottom>
-            今後の実装予定
-          </Typography>
-          <Typography color="text.secondary">
-            ここにサッカーノートの機能が追加されます
-          </Typography>
+          <Stack spacing={2}>
+            <Typography variant="h6" gutterBottom>
+              サッカーノート
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={() => router.push("/dashboard/notes")}
+              sx={{ alignSelf: "flex-start" }}
+            >
+              ノート一覧を見る
+            </Button>
+          </Stack>
         </Paper>
       </Stack>
     </Container>

@@ -17,6 +17,7 @@ use OpenApi\Attributes as OA;
             items: new OA\Items(
                 properties: [
                     new OA\Property(property: 'id', ref: '#/components/schemas/Note/properties/id'),
+                    new OA\Property(property: 'sqid', ref: '#/components/schemas/Note/properties/sqid'),
                     new OA\Property(property: 'user_id', ref: '#/components/schemas/Note/properties/user_id'),
                     new OA\Property(property: 'title', ref: '#/components/schemas/Note/properties/title'),
                     new OA\Property(property: 'date', ref: '#/components/schemas/Note/properties/date'),

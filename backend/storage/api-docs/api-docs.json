@@ -354,16 +354,16 @@
                     "Notes"
                 ],
                 "summary": "ノート詳細取得",
-                "description": "指定されたIDのノート詳細を取得します",
+                "description": "指定されたSqidまたはIDのノート詳細を取得します",
                 "operationId": "getNote",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ノートID",
+                        "description": "ノートSqidまたはID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     }
                 ],
@@ -396,16 +396,16 @@
                     "Notes"
                 ],
                 "summary": "ノート更新",
-                "description": "指定されたIDのノートを更新します",
+                "description": "指定されたSqidまたはIDのノートを更新します",
                 "operationId": "updateNote",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ノートID",
+                        "description": "ノートSqidまたはID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     }
                 ],
@@ -451,16 +451,16 @@
                     "Notes"
                 ],
                 "summary": "ノート削除",
-                "description": "指定されたIDのノートを削除します",
+                "description": "指定されたSqidまたはIDのノートを削除します",
                 "operationId": "deleteNote",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ノートID",
+                        "description": "ノートSqidまたはID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     }
                 ],
@@ -614,6 +614,11 @@
                         "type": "integer",
                         "format": "int64"
                     },
+                    "sqid": {
+                        "description": "Sqid (公開用ID)",
+                        "type": "string",
+                        "example": "aBc12DeF"
+                    },
                     "user_id": {
                         "description": "ユーザーID",
                         "type": "integer",
@@ -657,6 +662,11 @@
                         "description": "ユーザーID",
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "sqid": {
+                        "description": "Sqid (公開用ID)",
+                        "type": "string",
+                        "example": "xYz34WvU"
                     },
                     "name": {
                         "description": "ユーザー名",
@@ -875,6 +885,9 @@
                             "properties": {
                                 "id": {
                                     "$ref": "#/components/schemas/Note/properties/id"
+                                },
+                                "sqid": {
+                                    "$ref": "#/components/schemas/Note/properties/sqid"
                                 },
                                 "user_id": {
                                     "$ref": "#/components/schemas/Note/properties/user_id"
