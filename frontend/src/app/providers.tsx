@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthProvider } from "@/components/auth-provider";
+import { SnackbarProvider } from "@/contexts/snackbar-context";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -26,8 +27,10 @@ export function Providers({ children }: PropsWithChildren) {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider theme={theme}>
-          <CssBaseline />
-          {children}
+          <SnackbarProvider>
+            <CssBaseline />
+            {children}
+          </SnackbarProvider>
         </ThemeProvider>
       </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />

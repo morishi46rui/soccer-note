@@ -9,3 +9,11 @@ export type GetNotesParams = {
   page?: number;
   per_page?: number;
 };
+
+export type FormErrors = {
+  title?: string;
+  date?: string;
+  content?: string;
+};
+
+export type FormStatus = "idle" | "success" | "error";
