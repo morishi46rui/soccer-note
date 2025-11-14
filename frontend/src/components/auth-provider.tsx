@@ -23,6 +23,11 @@ const getInitialAuthState = () => {
     }
   }
 
+  // 初期化時にトークンをセット
+  if (authToken) {
+    apiClient.setAuthToken(authToken);
+  }
+
   return { user, token: authToken };
 };
 
