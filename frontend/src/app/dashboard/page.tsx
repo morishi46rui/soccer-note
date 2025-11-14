@@ -6,10 +6,9 @@ import {
   Description as DescriptionIcon,
 } from "@mui/icons-material";
 import { Box, Card, CardActionArea, Stack, Typography } from "@mui/material";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function DashboardPage() {
-  const router = useRouter();
 
   return (
     <DashboardLayout>
@@ -54,10 +53,7 @@ export default function DashboardPage() {
                   },
                 }}
               >
-                <CardActionArea
-                  onClick={() => router.push("/dashboard/notes/new")}
-                  sx={{ p: 3 }}
-                >
+                <CardActionArea component={Link} href="/notes/new" sx={{ p: 3 }}>
                   <Stack spacing={2} alignItems="center">
                     <AddIcon sx={{ fontSize: 40, color: "primary.main" }} />
                     <Typography variant="h6">新しいノート</Typography>
@@ -83,10 +79,7 @@ export default function DashboardPage() {
                   },
                 }}
               >
-                <CardActionArea
-                  onClick={() => router.push("/dashboard/notes")}
-                  sx={{ p: 3 }}
-                >
+                <CardActionArea component={Link} href="/notes" sx={{ p: 3 }}>
                   <Stack spacing={2} alignItems="center">
                     <DescriptionIcon
                       sx={{ fontSize: 40, color: "primary.main" }}

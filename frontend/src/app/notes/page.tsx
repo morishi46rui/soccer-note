@@ -4,11 +4,9 @@ import { DashboardLayout } from "@/components/dashboard-layout";
 import { NoteList } from "@/features/notes/components/note-list";
 import { Add as AddIcon } from "@mui/icons-material";
 import { Box, Button, Stack, Typography } from "@mui/material";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function NotesPage() {
-  const router = useRouter();
-
   return (
     <DashboardLayout>
       <Box sx={{ p: 4 }}>
@@ -23,9 +21,10 @@ export default function NotesPage() {
               ノート一覧
             </Typography>
             <Button
+              component={Link}
+              href="/notes/new"
               variant="contained"
               startIcon={<AddIcon />}
-              onClick={() => router.push("/dashboard/notes/new")}
             >
               新規作成
             </Button>

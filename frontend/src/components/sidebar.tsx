@@ -20,6 +20,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -33,15 +34,15 @@ const navItems: NavItem[] = [
   },
   {
     label: "ノート",
-    path: "/dashboard/notes",
+    path: "/notes",
     icon: <NotesIcon />,
   },
 ];
 
 export const Sidebar = () => {
-  const router = useRouter();
   const pathname = usePathname();
   const { logout } = useAuth();
+  const router = useRouter();
 
   // デスクトップ用の折りたたみ状態(初期値は閉じた状態)
   const [collapsed, setCollapsed] = useState(false);
@@ -96,8 +97,9 @@ export const Sidebar = () => {
                 {navItems.map((item) => (
                   <ListItem key={item.path} disablePadding>
                     <ListItemButton
+                      component={Link}
+                      href={item.path}
                       selected={pathname === item.path}
-                      onClick={() => router.push(item.path)}
                       sx={{
                         mx: 1,
                         borderRadius: 1,
