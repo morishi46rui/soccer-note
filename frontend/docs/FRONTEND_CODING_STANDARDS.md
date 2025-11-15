@@ -286,7 +286,7 @@ const handleDelete = async (id: string) => {
 
 ### Snackbar severity types
 
-`showSnackbar` の第2引数には、以下の severity を指定できます：
+`showSnackbar` の第 2 引数には、以下の severity を指定できます：
 
 - `"success"`: 操作が成功した場合（作成、更新、削除など）
 - `"error"`: エラーが発生した場合
