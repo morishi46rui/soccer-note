@@ -64,7 +64,14 @@ export class ApiClient {
         throw new ApiError(response.status, response.statusText, errorData);
       }
 
-      return await response.json();
+      // レスポンスボディが空の場合（204 No Contentなど）を処理
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        return undefined as T;
+      }
+
+      const text = await response.text();
+      return text ? JSON.parse(text) : (undefined as T);
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof ApiError) {

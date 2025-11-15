@@ -11,12 +11,11 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 import { useGetNotes } from "../api/get-notes";
 
 export function NoteList() {
-  const router = useRouter();
   const [page, setPage] = useState(1);
   const { data, isLoading, error } = useGetNotes({ page, per_page: 15 });
 
@@ -56,9 +55,7 @@ export function NoteList() {
       <Stack spacing={2}>
         {notes.map((note) => (
           <Card key={note.id} elevation={1}>
-            <CardActionArea
-              onClick={() => router.push(`/dashboard/notes/${note.sqid}`)}
-            >
+            <CardActionArea component={Link} href={`/notes/${note.sqid}`}>
               <CardContent>
                 <Stack spacing={1}>
                   <Typography variant="h6" component="h3" fontWeight="medium">

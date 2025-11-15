@@ -1,19 +1,19 @@
 import { useSnackbar } from "@/hooks/use-snackbar";
 import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { useCreateNote } from "../api/create-note";
-import type { CreateNoteFormValues, FormErrors } from "../types/note";
+import { useUpdateNote } from "../api/update-note";
+import type { FormErrors, Note, UpdateNoteFormValues } from "../types/note";
 
-export const useCreateNoteForm = () => {
+export const useUpdateNoteForm = (note: Note | undefined, sqid: string) => {
   const router = useRouter();
-  const { mutate, isPending } = useCreateNote();
+  const { mutate, isPending } = useUpdateNote();
   const { showSnackbar } = useSnackbar();
 
-  const [values, setValues] = useState<CreateNoteFormValues>({
-    title: "",
-    date: new Date().toISOString().split("T")[0], // 今日の日付をデフォルト値に
-    content: "",
-  });
+  const [values, setValues] = useState<UpdateNoteFormValues>(() => ({
+    title: note?.title || "",
+    date: note?.date || "",
+    content: note?.content || "",
+  }));
 
   const [errors, setErrors] = useState<FormErrors>({});
 
@@ -64,17 +64,22 @@ export const useCreateNoteForm = () => {
       return;
     }
 
-    mutate(values, {
-      onSuccess: () => {
-        showSnackbar("ノートを作成しました!", "success");
-        router.push("/notes");
-      },
-      onError: (error) => {
-        const errorMsg =
-          error instanceof Error ? error.message : "ノートの作成に失敗しました";
-        showSnackbar(errorMsg, "error");
-      },
-    });
+    mutate(
+      { sqid, data: values },
+      {
+        onSuccess: () => {
+          showSnackbar("ノートを更新しました!", "success");
+          router.push(`/notes/${sqid}`);
+        },
+        onError: (error) => {
+          const errorMsg =
+            error instanceof Error
+              ? error.message
+              : "ノートの更新に失敗しました";
+          showSnackbar(errorMsg, "error");
+        },
+      }
+    );
   };
 
   return {

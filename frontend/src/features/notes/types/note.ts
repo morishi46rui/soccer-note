@@ -17,3 +17,16 @@ export type FormErrors = {
 };
 
 export type FormStatus = "idle" | "success" | "error";
+
+export type PageParams = {
+  params: Promise<{ sqid: string }>;
+};
+
+export type UpdateNoteFormProps = {
+  note: Note | undefined;
+  sqid: string;
+};
+
+export type CreateNoteFormValues = CreateNoteRequest;
+
+export type UpdateNoteFormValues = UpdateNoteRequest;
