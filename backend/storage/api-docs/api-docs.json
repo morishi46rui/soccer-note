@@ -231,6 +231,219 @@
                 ]
             }
         },
+        "/api/v1/groups": {
+            "get": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "グループ一覧取得",
+                "description": "グループ一覧を取得します",
+                "operationId": "getGroups",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/per_page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "取得成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetGroupsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "グループ作成",
+                "description": "新しいグループを作成します",
+                "operationId": "createGroup",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateGroupRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "作成成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateGroupResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/groups/{sqid}": {
+            "get": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "グループ詳細取得",
+                "description": "指定されたSqidのグループ詳細を取得します",
+                "operationId": "getGroup",
+                "parameters": [
+                    {
+                        "name": "sqid",
+                        "in": "path",
+                        "description": "グループSqid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "取得成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetGroupResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "グループ更新",
+                "description": "指定されたSqidのグループを更新します",
+                "operationId": "updateGroup",
+                "parameters": [
+                    {
+                        "name": "sqid",
+                        "in": "path",
+                        "description": "グループSqid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateGroupRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "更新成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdateGroupResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "グループ削除",
+                "description": "指定されたSqidのグループを削除します",
+                "operationId": "deleteGroup",
+                "parameters": [
+                    {
+                        "name": "sqid",
+                        "in": "path",
+                        "description": "グループSqid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "削除成功"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/health": {
             "get": {
                 "tags": [
@@ -947,6 +1160,38 @@
                 },
                 "type": "object"
             },
+            "CreateGroupRequest": {
+                "required": [
+                    "team_id",
+                    "name"
+                ],
+                "properties": {
+                    "team_id": {
+                        "$ref": "#/components/schemas/Group/properties/team_id"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/Group/properties/name"
+                    },
+                    "description": {
+                        "$ref": "#/components/schemas/Group/properties/description"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateGroupRequest": {
+                "properties": {
+                    "team_id": {
+                        "$ref": "#/components/schemas/Group/properties/team_id"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/Group/properties/name"
+                    },
+                    "description": {
+                        "$ref": "#/components/schemas/Group/properties/description"
+                    }
+                },
+                "type": "object"
+            },
             "CreateNoteRequest": {
                 "required": [
                     "title",
@@ -1006,6 +1251,45 @@
                     },
                     "description": {
                         "$ref": "#/components/schemas/Team/properties/description"
+                    }
+                },
+                "type": "object"
+            },
+            "Group": {
+                "properties": {
+                    "id": {
+                        "description": "グループID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "sqid": {
+                        "description": "Sqid (公開用ID)",
+                        "type": "string",
+                        "example": "aBc12DeF"
+                    },
+                    "team_id": {
+                        "description": "チームID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "description": "グループ名",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "グループの説明",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "作成日時",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "更新日時",
+                        "type": "string",
+                        "format": "date-time"
                     }
                 },
                 "type": "object"
@@ -1258,6 +1542,134 @@
                     },
                     "updated_at": {
                         "$ref": "#/components/schemas/User/properties/updated_at"
+                    }
+                },
+                "type": "object"
+            },
+            "CreateGroupResponse": {
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/Group/properties/id"
+                    },
+                    "sqid": {
+                        "$ref": "#/components/schemas/Group/properties/sqid"
+                    },
+                    "team_id": {
+                        "$ref": "#/components/schemas/Group/properties/team_id"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/Group/properties/name"
+                    },
+                    "description": {
+                        "$ref": "#/components/schemas/Group/properties/description"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/Group/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/Group/properties/updated_at"
+                    }
+                },
+                "type": "object"
+            },
+            "GetGroupResponse": {
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/Group/properties/id"
+                    },
+                    "sqid": {
+                        "$ref": "#/components/schemas/Group/properties/sqid"
+                    },
+                    "team_id": {
+                        "$ref": "#/components/schemas/Group/properties/team_id"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/Group/properties/name"
+                    },
+                    "description": {
+                        "$ref": "#/components/schemas/Group/properties/description"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/Group/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/Group/properties/updated_at"
+                    }
+                },
+                "type": "object"
+            },
+            "GetGroupsResponse": {
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "$ref": "#/components/schemas/Group/properties/id"
+                                },
+                                "sqid": {
+                                    "$ref": "#/components/schemas/Group/properties/sqid"
+                                },
+                                "team_id": {
+                                    "$ref": "#/components/schemas/Group/properties/team_id"
+                                },
+                                "name": {
+                                    "$ref": "#/components/schemas/Group/properties/name"
+                                },
+                                "description": {
+                                    "$ref": "#/components/schemas/Group/properties/description"
+                                },
+                                "created_at": {
+                                    "$ref": "#/components/schemas/Group/properties/created_at"
+                                },
+                                "updated_at": {
+                                    "$ref": "#/components/schemas/Group/properties/updated_at"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 72
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateGroupResponse": {
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/Group/properties/id"
+                    },
+                    "sqid": {
+                        "$ref": "#/components/schemas/Group/properties/sqid"
+                    },
+                    "team_id": {
+                        "$ref": "#/components/schemas/Group/properties/team_id"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/Group/properties/name"
+                    },
+                    "description": {
+                        "$ref": "#/components/schemas/Group/properties/description"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/Group/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/Group/properties/updated_at"
                     }
                 },
                 "type": "object"
@@ -1612,6 +2024,10 @@
         {
             "name": "Auth",
             "description": "認証"
+        },
+        {
+            "name": "Groups",
+            "description": "グループ管理"
         },
         {
             "name": "Health",

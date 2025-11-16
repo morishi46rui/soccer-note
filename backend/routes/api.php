@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\GroupController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\NoteController;
 use App\Http\Controllers\Api\V1\PermissionController;
@@ -19,6 +20,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
         Route::put('/auth/password', [AuthController::class, 'updatePassword']);
+        Route::get('/groups', [GroupController::class, 'index']);
+        Route::post('/groups', [GroupController::class, 'store']);
+        Route::get('/groups/{sqid}', [GroupController::class, 'show']);
+        Route::put('/groups/{sqid}', [GroupController::class, 'update']);
+        Route::delete('/groups/{sqid}', [GroupController::class, 'destroy']);
         Route::get('/notes', [NoteController::class, 'index']);
         Route::post('/notes', [NoteController::class, 'store']);
         Route::get('/notes/{sqid}', [NoteController::class, 'show']);

@@ -124,6 +124,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * グループ一覧取得
+         * @description グループ一覧を取得します
+         */
+        get: operations["getGroups"];
+        put?: never;
+        /**
+         * グループ作成
+         * @description 新しいグループを作成します
+         */
+        post: operations["createGroup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/groups/{sqid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * グループ詳細取得
+         * @description 指定されたSqidのグループ詳細を取得します
+         */
+        get: operations["getGroup"];
+        /**
+         * グループ更新
+         * @description 指定されたSqidのグループを更新します
+         */
+        put: operations["updateGroup"];
+        post?: never;
+        /**
+         * グループ削除
+         * @description 指定されたSqidのグループを削除します
+         */
+        delete: operations["deleteGroup"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -337,6 +389,16 @@ export interface components {
             name?: components["schemas"]["User"]["name"];
             email?: components["schemas"]["User"]["email"];
         };
+        CreateGroupRequest: {
+            team_id: components["schemas"]["Group"]["team_id"];
+            name: components["schemas"]["Group"]["name"];
+            description?: components["schemas"]["Group"]["description"];
+        };
+        UpdateGroupRequest: {
+            team_id?: components["schemas"]["Group"]["team_id"];
+            name?: components["schemas"]["Group"]["name"];
+            description?: components["schemas"]["Group"]["description"];
+        };
         CreateNoteRequest: {
             title: components["schemas"]["Note"]["title"];
             date: components["schemas"]["Note"]["date"];
@@ -354,6 +416,37 @@ export interface components {
         UpdateTeamRequest: {
             name?: components["schemas"]["Team"]["name"];
             description?: components["schemas"]["Team"]["description"];
+        };
+        Group: {
+            /**
+             * Format: int64
+             * @description グループID
+             */
+            id?: number;
+            /**
+             * @description Sqid (公開用ID)
+             * @example aBc12DeF
+             */
+            sqid?: string;
+            /**
+             * Format: int64
+             * @description チームID
+             */
+            team_id?: number;
+            /** @description グループ名 */
+            name?: string;
+            /** @description グループの説明 */
+            description?: string | null;
+            /**
+             * Format: date-time
+             * @description 作成日時
+             */
+            created_at?: string;
+            /**
+             * Format: date-time
+             * @description 更新日時
+             */
+            updated_at?: string;
         };
         Note: {
             /**
@@ -510,6 +603,52 @@ export interface components {
             email_verified_at?: components["schemas"]["User"]["email_verified_at"];
             created_at?: components["schemas"]["User"]["created_at"];
             updated_at?: components["schemas"]["User"]["updated_at"];
+        };
+        CreateGroupResponse: {
+            id?: components["schemas"]["Group"]["id"];
+            sqid?: components["schemas"]["Group"]["sqid"];
+            team_id?: components["schemas"]["Group"]["team_id"];
+            name?: components["schemas"]["Group"]["name"];
+            description?: components["schemas"]["Group"]["description"];
+            created_at?: components["schemas"]["Group"]["created_at"];
+            updated_at?: components["schemas"]["Group"]["updated_at"];
+        };
+        GetGroupResponse: {
+            id?: components["schemas"]["Group"]["id"];
+            sqid?: components["schemas"]["Group"]["sqid"];
+            team_id?: components["schemas"]["Group"]["team_id"];
+            name?: components["schemas"]["Group"]["name"];
+            description?: components["schemas"]["Group"]["description"];
+            created_at?: components["schemas"]["Group"]["created_at"];
+            updated_at?: components["schemas"]["Group"]["updated_at"];
+        };
+        GetGroupsResponse: {
+            data?: {
+                id?: components["schemas"]["Group"]["id"];
+                sqid?: components["schemas"]["Group"]["sqid"];
+                team_id?: components["schemas"]["Group"]["team_id"];
+                name?: components["schemas"]["Group"]["name"];
+                description?: components["schemas"]["Group"]["description"];
+                created_at?: components["schemas"]["Group"]["created_at"];
+                updated_at?: components["schemas"]["Group"]["updated_at"];
+            }[];
+            /** @example 1 */
+            current_page?: number;
+            /** @example 5 */
+            last_page?: number;
+            /** @example 15 */
+            per_page?: number;
+            /** @example 72 */
+            total?: number;
+        };
+        UpdateGroupResponse: {
+            id?: components["schemas"]["Group"]["id"];
+            sqid?: components["schemas"]["Group"]["sqid"];
+            team_id?: components["schemas"]["Group"]["team_id"];
+            name?: components["schemas"]["Group"]["name"];
+            description?: components["schemas"]["Group"]["description"];
+            created_at?: components["schemas"]["Group"]["created_at"];
+            updated_at?: components["schemas"]["Group"]["updated_at"];
         };
         CreateNoteResponse: {
             id?: components["schemas"]["Note"]["id"];
@@ -854,6 +993,136 @@ export interface operations {
                 };
                 content?: never;
             };
+        };
+    };
+    getGroups: {
+        parameters: {
+            query?: {
+                /** @description ページ番号 */
+                page?: components["parameters"]["page"];
+                /** @description 1ページあたりの件数 */
+                per_page?: components["parameters"]["per_page"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 取得成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetGroupsResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+        };
+    };
+    createGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateGroupRequest"];
+            };
+        };
+        responses: {
+            /** @description 作成成功 */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateGroupResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            422: components["responses"]["422"];
+        };
+    };
+    getGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description グループSqid */
+                sqid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 取得成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetGroupResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+        };
+    };
+    updateGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description グループSqid */
+                sqid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGroupRequest"];
+            };
+        };
+        responses: {
+            /** @description 更新成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateGroupResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            422: components["responses"]["422"];
+        };
+    };
+    deleteGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description グループSqid */
+                sqid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 削除成功 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
         };
     };
     getHealth: {
