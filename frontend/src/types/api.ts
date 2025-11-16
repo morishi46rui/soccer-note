@@ -236,6 +236,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * チーム一覧取得
+         * @description チーム一覧を取得します
+         */
+        get: operations["getTeams"];
+        put?: never;
+        /**
+         * チーム作成
+         * @description 新しいチームを作成します
+         */
+        post: operations["createTeam"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * チーム詳細取得
+         * @description 指定されたSqidまたはIDのチーム詳細を取得します
+         */
+        get: operations["getTeam"];
+        /**
+         * チーム更新
+         * @description 指定されたSqidまたはIDのチームを更新します
+         */
+        put: operations["updateTeam"];
+        post?: never;
+        /**
+         * チーム削除
+         * @description 指定されたSqidまたはIDのチームを削除します
+         */
+        delete: operations["deleteTeam"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -295,6 +347,14 @@ export interface components {
             date: components["schemas"]["Note"]["date"];
             content: components["schemas"]["Note"]["content"];
         };
+        CreateTeamRequest: {
+            name: components["schemas"]["Team"]["name"];
+            description?: components["schemas"]["Team"]["description"];
+        };
+        UpdateTeamRequest: {
+            name?: components["schemas"]["Team"]["name"];
+            description?: components["schemas"]["Team"]["description"];
+        };
         Note: {
             /**
              * Format: int64
@@ -335,6 +395,32 @@ export interface components {
              * @description 論理削除日時
              */
             deleted_at?: string | null;
+        };
+        Team: {
+            /**
+             * Format: int64
+             * @description チームID
+             */
+            id?: number;
+            /**
+             * @description Sqid (公開用ID)
+             * @example aBc12DeF
+             */
+            sqid?: string;
+            /** @description チーム名 */
+            name?: string;
+            /** @description チームの説明 */
+            description?: string | null;
+            /**
+             * Format: date-time
+             * @description 作成日時
+             */
+            created_at?: string;
+            /**
+             * Format: date-time
+             * @description 更新日時
+             */
+            updated_at?: string;
         };
         User: {
             /**
@@ -471,6 +557,48 @@ export interface components {
             content?: components["schemas"]["Note"]["content"];
             created_at?: components["schemas"]["Note"]["created_at"];
             updated_at?: components["schemas"]["Note"]["updated_at"];
+        };
+        CreateTeamResponse: {
+            id?: components["schemas"]["Team"]["id"];
+            sqid?: components["schemas"]["Team"]["sqid"];
+            name?: components["schemas"]["Team"]["name"];
+            description?: components["schemas"]["Team"]["description"];
+            created_at?: components["schemas"]["Team"]["created_at"];
+            updated_at?: components["schemas"]["Team"]["updated_at"];
+        };
+        GetTeamResponse: {
+            id?: components["schemas"]["Team"]["id"];
+            sqid?: components["schemas"]["Team"]["sqid"];
+            name?: components["schemas"]["Team"]["name"];
+            description?: components["schemas"]["Team"]["description"];
+            created_at?: components["schemas"]["Team"]["created_at"];
+            updated_at?: components["schemas"]["Team"]["updated_at"];
+        };
+        GetTeamsResponse: {
+            data?: {
+                id?: components["schemas"]["Team"]["id"];
+                sqid?: components["schemas"]["Team"]["sqid"];
+                name?: components["schemas"]["Team"]["name"];
+                description?: components["schemas"]["Team"]["description"];
+                created_at?: components["schemas"]["Team"]["created_at"];
+                updated_at?: components["schemas"]["Team"]["updated_at"];
+            }[];
+            /** @example 1 */
+            current_page?: number;
+            /** @example 5 */
+            last_page?: number;
+            /** @example 15 */
+            per_page?: number;
+            /** @example 72 */
+            total?: number;
+        };
+        UpdateTeamResponse: {
+            id?: components["schemas"]["Team"]["id"];
+            sqid?: components["schemas"]["Team"]["sqid"];
+            name?: components["schemas"]["Team"]["name"];
+            description?: components["schemas"]["Team"]["description"];
+            created_at?: components["schemas"]["Team"]["created_at"];
+            updated_at?: components["schemas"]["Team"]["updated_at"];
         };
     };
     responses: {
@@ -1017,6 +1145,136 @@ export interface operations {
                 };
             };
             401: components["responses"]["401"];
+        };
+    };
+    getTeams: {
+        parameters: {
+            query?: {
+                /** @description ページ番号 */
+                page?: components["parameters"]["page"];
+                /** @description 1ページあたりの件数 */
+                per_page?: components["parameters"]["per_page"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 取得成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetTeamsResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+        };
+    };
+    createTeam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTeamRequest"];
+            };
+        };
+        responses: {
+            /** @description 作成成功 */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateTeamResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            422: components["responses"]["422"];
+        };
+    };
+    getTeam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description チームSqidまたはID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 取得成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetTeamResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+        };
+    };
+    updateTeam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description チームSqidまたはID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTeamRequest"];
+            };
+        };
+        responses: {
+            /** @description 更新成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateTeamResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            422: components["responses"]["422"];
+        };
+    };
+    deleteTeam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description チームSqidまたはID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 削除成功 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
         };
     };
 }

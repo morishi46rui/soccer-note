@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\NoteController;
 use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\Api\V1\RoleController;
+use App\Http\Controllers\Api\V1\TeamController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -25,5 +26,10 @@ Route::prefix('v1')->group(function () {
         Route::delete('/notes/{id}', [NoteController::class, 'destroy']);
         Route::get('/permissions', [PermissionController::class, 'index']);
         Route::get('/roles', [RoleController::class, 'index']);
+        Route::get('/teams', [TeamController::class, 'index']);
+        Route::post('/teams', [TeamController::class, 'store']);
+        Route::get('/teams/{id}', [TeamController::class, 'show']);
+        Route::put('/teams/{id}', [TeamController::class, 'update']);
+        Route::delete('/teams/{id}', [TeamController::class, 'destroy']);
     });
 });

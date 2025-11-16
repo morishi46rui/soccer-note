@@ -646,6 +646,219 @@
                     }
                 ]
             }
+        },
+        "/api/v1/teams": {
+            "get": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "チーム一覧取得",
+                "description": "チーム一覧を取得します",
+                "operationId": "getTeams",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/per_page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "取得成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetTeamsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "チーム作成",
+                "description": "新しいチームを作成します",
+                "operationId": "createTeam",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTeamRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "作成成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateTeamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/teams/{id}": {
+            "get": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "チーム詳細取得",
+                "description": "指定されたSqidまたはIDのチーム詳細を取得します",
+                "operationId": "getTeam",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "チームSqidまたはID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "取得成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetTeamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "チーム更新",
+                "description": "指定されたSqidまたはIDのチームを更新します",
+                "operationId": "updateTeam",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "チームSqidまたはID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateTeamRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "更新成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdateTeamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "チーム削除",
+                "description": "指定されたSqidまたはIDのチームを削除します",
+                "operationId": "deleteTeam",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "チームSqidまたはID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "削除成功"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -772,6 +985,31 @@
                 },
                 "type": "object"
             },
+            "CreateTeamRequest": {
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "$ref": "#/components/schemas/Team/properties/name"
+                    },
+                    "description": {
+                        "$ref": "#/components/schemas/Team/properties/description"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateTeamRequest": {
+                "properties": {
+                    "name": {
+                        "$ref": "#/components/schemas/Team/properties/name"
+                    },
+                    "description": {
+                        "$ref": "#/components/schemas/Team/properties/description"
+                    }
+                },
+                "type": "object"
+            },
             "Note": {
                 "properties": {
                     "id": {
@@ -817,6 +1055,40 @@
                         "type": "string",
                         "format": "date-time",
                         "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Team": {
+                "properties": {
+                    "id": {
+                        "description": "チームID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "sqid": {
+                        "description": "Sqid (公開用ID)",
+                        "type": "string",
+                        "example": "aBc12DeF"
+                    },
+                    "name": {
+                        "description": "チーム名",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "チームの説明",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "作成日時",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "更新日時",
+                        "type": "string",
+                        "format": "date-time"
                     }
                 },
                 "type": "object"
@@ -1120,6 +1392,122 @@
                     }
                 },
                 "type": "object"
+            },
+            "CreateTeamResponse": {
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/Team/properties/id"
+                    },
+                    "sqid": {
+                        "$ref": "#/components/schemas/Team/properties/sqid"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/Team/properties/name"
+                    },
+                    "description": {
+                        "$ref": "#/components/schemas/Team/properties/description"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/Team/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/Team/properties/updated_at"
+                    }
+                },
+                "type": "object"
+            },
+            "GetTeamResponse": {
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/Team/properties/id"
+                    },
+                    "sqid": {
+                        "$ref": "#/components/schemas/Team/properties/sqid"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/Team/properties/name"
+                    },
+                    "description": {
+                        "$ref": "#/components/schemas/Team/properties/description"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/Team/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/Team/properties/updated_at"
+                    }
+                },
+                "type": "object"
+            },
+            "GetTeamsResponse": {
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "$ref": "#/components/schemas/Team/properties/id"
+                                },
+                                "sqid": {
+                                    "$ref": "#/components/schemas/Team/properties/sqid"
+                                },
+                                "name": {
+                                    "$ref": "#/components/schemas/Team/properties/name"
+                                },
+                                "description": {
+                                    "$ref": "#/components/schemas/Team/properties/description"
+                                },
+                                "created_at": {
+                                    "$ref": "#/components/schemas/Team/properties/created_at"
+                                },
+                                "updated_at": {
+                                    "$ref": "#/components/schemas/Team/properties/updated_at"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 72
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateTeamResponse": {
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/Team/properties/id"
+                    },
+                    "sqid": {
+                        "$ref": "#/components/schemas/Team/properties/sqid"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/Team/properties/name"
+                    },
+                    "description": {
+                        "$ref": "#/components/schemas/Team/properties/description"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/Team/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/Team/properties/updated_at"
+                    }
+                },
+                "type": "object"
             }
         },
         "responses": {
@@ -1240,6 +1628,10 @@
         {
             "name": "Roles",
             "description": "ロール管理"
+        },
+        {
+            "name": "Teams",
+            "description": "チーム管理"
         }
     ]
 }

@@ -615,15 +615,26 @@ if ($result === null) {
 
 ## Testing
 
-### Feature Tests
+**重要**: 新しい機能を実装する際は、以下のすべてのテストを必ず作成してください。
+
+### 必須テスト一覧
+
+新機能の実装時には、以下のテストをすべて作成してください：
+
+1. **Controller Tests (Feature Test)** - API エンドポイントのテスト
+2. **Action Tests (Unit Test)** - ビジネスロジックのテスト
+3. **Request Tests (Unit Test)** - バリデーションのテスト
+4. **Model Tests (Unit Test)** - モデルのリレーションや振る舞いのテスト
+
+### Feature Tests (Controller)
 
 API エンドポイントには必ず Feature Test を書いてください。
 
--   配置場所: `tests/Feature/{Feature}/`
+-   配置場所: `tests/Feature/Http/Controllers/Api/V1/{Feature}ControllerTest.php`
 
 ```php
-// tests/Feature/Note/CreateNoteTest.php
-public function test_can_create_note(): void
+// tests/Feature/Http/Controllers/Api/V1/NoteControllerTest.php
+public function test_it_creates_a_note(): void
 {
     $user = User::factory()->create();
 
@@ -652,22 +663,164 @@ public function test_can_create_note(): void
 }
 ```
 
+**テストすべき項目**:
+
+-   各エンドポイント (index, store, show, update, destroy)
+-   ページネーション
+-   認証チェック
+-   バリデーションエラー
+-   404 エラー
+-   Sqid と数値 ID の両方のサポート
+
+### Unit Tests (Actions)
+
+各 Action クラスには Unit Test を書いてください。
+
+-   配置場所: `tests/Unit/UseCase/{Feature}/{ActionName}Test.php`
+
+```php
+// tests/Unit/UseCase/Note/CreateNoteActionTest.php
+public function test_it_creates_a_note(): void
+{
+    $action = new CreateNoteAction();
+    $data = [
+        'title' => 'Test Note',
+        'date' => '2025-11-15',
+        'content' => 'Test content',
+    ];
+
+    $note = $action->execute(1, $data);
+
+    $this->assertInstanceOf(Note::class, $note);
+    $this->assertEquals('Test Note', $note->title);
+    $this->assertDatabaseHas('notes', [
+        'user_id' => 1,
+        'title' => 'Test Note',
+    ]);
+}
+```
+
+**テストすべき項目**:
+
+-   正常系の動作
+-   戻り値の型と内容
+-   データベースへの保存確認
+
+### Unit Tests (Requests)
+
+各 Request クラスには Unit Test を書いてください。
+
+-   配置場所: `tests/Unit/Http/Requests/{Feature}/{RequestName}Test.php`
+
+```php
+// tests/Unit/Http/Requests/Note/CreateNoteRequestTest.php
+public function test_it_validates_required_fields(): void
+{
+    $request = new CreateNoteRequest();
+
+    $rules = $request->rules();
+
+    $this->assertArrayHasKey('title', $rules);
+    $this->assertContains('required', $rules['title']);
+    $this->assertContains('string', $rules['title']);
+}
+
+public function test_it_authorizes_authenticated_users(): void
+{
+    $request = new CreateNoteRequest();
+
+    $this->assertTrue($request->authorize());
+}
+```
+
+**テストすべき項目**:
+
+-   バリデーションルールの確認
+-   authorize メソッドの戻り値
+
+### Unit Tests (Models)
+
+各 Model クラスには Unit Test を書いてください。
+
+-   配置場所: `tests/Unit/Models/{ModelName}Test.php`
+
+```php
+// tests/Unit/Models/NoteTest.php
+public function test_it_has_fillable_attributes(): void
+{
+    $note = new Note();
+
+    $this->assertEquals(
+        ['user_id', 'title', 'date', 'content'],
+        $note->getFillable()
+    );
+}
+
+public function test_it_belongs_to_user(): void
+{
+    $note = Note::factory()->create();
+
+    $this->assertInstanceOf(User::class, $note->user);
+}
+
+public function test_it_casts_date_attribute(): void
+{
+    $note = Note::factory()->create(['date' => '2025-11-15']);
+
+    $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $note->date);
+}
+
+public function test_it_appends_sqid(): void
+{
+    $note = Note::factory()->create();
+
+    $this->assertArrayHasKey('sqid', $note->toArray());
+}
+```
+
+**テストすべき項目**:
+
+-   fillable 属性
+-   casts 属性
+-   appends 属性
+-   リレーション
+-   Trait の動作 (HasSqid など)
+
 ### Test Organization
 
-テストは機能ごとにディレクトリを分けてください。
+テストは機能とレイヤーごとにディレクトリを分けてください。
 
 ```
 tests/
 ├── Feature/
-│   ├── Auth/
-│   │   ├── LoginTest.php
-│   │   ├── RegisterTest.php
-│   │   └── LogoutTest.php
-│   └── Note/
-│       ├── CreateNoteTest.php
-│       ├── GetNotesTest.php
-│       └── UpdateNoteTest.php
+│   └── Http/
+│       └── Controllers/
+│           └── Api/
+│               └── V1/
+│                   ├── NoteControllerTest.php
+│                   ├── TeamControllerTest.php
+│                   └── ...
 └── Unit/
+    ├── Models/
+    │   ├── NoteTest.php
+    │   ├── TeamTest.php
+    │   └── UserTest.php
+    ├── UseCase/
+    │   ├── Note/
+    │   │   ├── CreateNoteActionTest.php
+    │   │   ├── UpdateNoteActionTest.php
+    │   │   └── ...
+    │   └── Team/
+    │       ├── CreateTeamActionTest.php
+    │       └── ...
+    └── Http/
+        └── Requests/
+            ├── Note/
+            │   ├── CreateNoteRequestTest.php
+            │   └── UpdateNoteRequestTest.php
+            └── Team/
+                ├── CreateTeamRequestTest.php
+                └── UpdateTeamRequestTest.php
 ```
 
 ### Authentication in Tests
@@ -679,6 +832,21 @@ $user = User::factory()->create();
 
 $response = $this->actingAs($user)
     ->getJson('/api/v1/notes');
+```
+
+### Test Naming Conventions
+
+テスト名は `test_it_{action}_{condition}` の形式で記述してください。
+
+```php
+// ✅ Good
+public function test_it_creates_a_note(): void
+public function test_it_validates_required_fields(): void
+public function test_it_returns_404_when_note_not_found(): void
+
+// ❌ Bad
+public function testCreate(): void
+public function test_validation(): void
 ```
 
 ## Best Practices
