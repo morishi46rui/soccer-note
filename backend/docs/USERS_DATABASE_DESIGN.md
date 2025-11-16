@@ -199,31 +199,91 @@ Soccer Note アプリケーションのデータベース設計ドキュメン�
 
 #### notes (ノート)
 
-既存テーブルを拡張し、ポリモーフィック関連を追加。
+既存テーブルを拡張し、各エンティティとの紐付けは専用の中間テーブルで管理する。
 
-| カラム名     | 型           | NULL | デフォルト     | 説明                                         |
-| ------------ | ------------ | ---- | -------------- | -------------------------------------------- |
-| id           | bigint       | NO   | AUTO_INCREMENT | 主キー                                       |
-| user_id      | bigint       | NO   | -              | 作成者のユーザー ID (外部キー)               |
-| notable_type | varchar(255) | NO   | -              | 紐づく対象のタイプ ('user', 'team', 'group') |
-| notable_id   | bigint       | NO   | -              | 紐づく対象の ID                              |
-| title        | varchar(255) | NO   | -              | タイトル                                     |
-| content      | text         | NO   | -              | 内容                                         |
-| created_at   | timestamp    | YES  | NULL           | 作成日時                                     |
-| updated_at   | timestamp    | YES  | NULL           | 更新日時                                     |
+| カラム名   | 型           | NULL | デフォルト     | 説明                           |
+| ---------- | ------------ | ---- | -------------- | ------------------------------ |
+| id         | bigint       | NO   | AUTO_INCREMENT | 主キー                         |
+| user_id    | bigint       | NO   | -              | 作成者のユーザー ID (外部キー) |
+| title      | varchar(255) | NO   | -              | タイトル                       |
+| content    | text         | NO   | -              | 内容                           |
+| created_at | timestamp    | YES  | NULL           | 作成日時                       |
+| updated_at | timestamp    | YES  | NULL           | 更新日時                       |
 
 **インデックス**
 
 -   PRIMARY KEY: `id`
 -   FOREIGN KEY: `user_id` REFERENCES `users(id)` ON DELETE CASCADE
 -   INDEX: `user_id`
--   INDEX: `(notable_type, notable_id)` (ポリモーフィック関連用の複合インデックス)
 
-**notable_type の値**
+---
 
--   `user`: 個人ノート (notable_id = user_id)
--   `team`: チームノート (notable_id = team_id)
--   `group`: グループノート (notable_id = group_id)
+#### user_notes (個人ノート)
+
+個人用ノートと個人の紐付け。
+
+| カラム名   | 型        | NULL | デフォルト     | 説明                   |
+| ---------- | --------- | ---- | -------------- | ---------------------- |
+| id         | bigint    | NO   | AUTO_INCREMENT | 主キー                 |
+| note_id    | bigint    | NO   | -              | ノート ID (外部キー)   |
+| user_id    | bigint    | NO   | -              | ユーザー ID (外部キー) |
+| created_at | timestamp | YES  | NULL           | 作成日時               |
+| updated_at | timestamp | YES  | NULL           | 更新日時               |
+
+**インデックス**
+
+-   PRIMARY KEY: `id`
+-   UNIQUE: `note_id` (1 つのノートは 1 つの個人にのみ紐づく)
+-   FOREIGN KEY: `note_id` REFERENCES `notes(id)` ON DELETE CASCADE
+-   FOREIGN KEY: `user_id` REFERENCES `users(id)` ON DELETE CASCADE
+-   INDEX: `note_id`
+-   INDEX: `user_id`
+
+---
+
+#### team_notes (チームノート)
+
+チーム用ノートとチームの紐付け。
+
+| カラム名   | 型        | NULL | デフォルト     | 説明                 |
+| ---------- | --------- | ---- | -------------- | -------------------- |
+| id         | bigint    | NO   | AUTO_INCREMENT | 主キー               |
+| note_id    | bigint    | NO   | -              | ノート ID (外部キー) |
+| team_id    | bigint    | NO   | -              | チーム ID (外部キー) |
+| created_at | timestamp | YES  | NULL           | 作成日時             |
+| updated_at | timestamp | YES  | NULL           | 更新日時             |
+
+**インデックス**
+
+-   PRIMARY KEY: `id`
+-   UNIQUE: `note_id` (1 つのノートは 1 つのチームにのみ紐づく)
+-   FOREIGN KEY: `note_id` REFERENCES `notes(id)` ON DELETE CASCADE
+-   FOREIGN KEY: `team_id` REFERENCES `teams(id)` ON DELETE CASCADE
+-   INDEX: `note_id`
+-   INDEX: `team_id`
+
+---
+
+#### group_notes (グループノート)
+
+グループ用ノートとグループの紐付け。
+
+| カラム名   | 型        | NULL | デフォルト     | 説明                   |
+| ---------- | --------- | ---- | -------------- | ---------------------- |
+| id         | bigint    | NO   | AUTO_INCREMENT | 主キー                 |
+| note_id    | bigint    | NO   | -              | ノート ID (外部キー)   |
+| group_id   | bigint    | NO   | -              | グループ ID (外部キー) |
+| created_at | timestamp | YES  | NULL           | 作成日時               |
+| updated_at | timestamp | YES  | NULL           | 更新日時               |
+
+**インデックス**
+
+-   PRIMARY KEY: `id`
+-   UNIQUE: `note_id` (1 つのノートは 1 つのグループにのみ紐づく)
+-   FOREIGN KEY: `note_id` REFERENCES `notes(id)` ON DELETE CASCADE
+-   FOREIGN KEY: `group_id` REFERENCES `groups(id)` ON DELETE CASCADE
+-   INDEX: `note_id`
+-   INDEX: `group_id`
 
 ---
 
@@ -231,34 +291,49 @@ Soccer Note アプリケーションのデータベース設計ドキュメン�
 
 ```
 ┌──────────┐
-│  teams   │
-└────┬─────┘
-     │ 1
-     │
-     │ N
-┌────┴─────┐         ┌─────────────┐
-│  groups  │         │ team_user   │
-└────┬─────┘         └──────┬──────┘
-     │ 1                    │
-     │                      │
-     │ N              ┌─────┴──────┐
-┌────┴──────┐        │   roles    │
-│group_user │        └──────┬─────┘
-└─────┬─────┘               │
-      │                     │
-      │               ┌─────┴──────────┐
-      │               │role_permissions│
-      │               └──────┬─────────┘
-      │                      │
-┌─────┴─────┐         ┌──────┴──────┐
-│   users   │         │ permissions │
-└─────┬─────┘         └─────────────┘
-      │ 1
-      │
-      │ N
-┌─────┴─────┐
-│   notes   │
-└───────────┘
+│  teams   │────────┐
+└────┬─────┘        │
+     │ 1            │
+     │              │
+     │ N            │
+┌────┴─────┐       │         ┌─────────────┐
+│  groups  │───┐   │         │ team_user   │
+└────┬─────┘   │   │         └──────┬──────┘
+     │ 1       │   │                │
+     │         │   │          ┌─────┴──────┐
+     │ N       │   │          │   roles    │
+┌────┴──────┐ │   │          └──────┬─────┘
+│group_user │ │   │                 │
+└─────┬─────┘ │   │           ┌─────┴──────────┐
+      │       │   │           │role_permissions│
+      │       │   │           └──────┬─────────┘
+      │       │   │                  │
+┌─────┴─────┐ │   │           ┌──────┴──────┐
+│   users   │─┼───┼───┐       │ permissions │
+└─────┬─────┘ │   │   │       └─────────────┘
+      │ 1     │   │   │
+      │       │   │   │
+      │ N     │   │   │
+┌─────┴─────┐ │   │   │
+│   notes   │ │   │   │
+└─────┬─────┘ │   │   │
+      │       │   │   │
+      ├───────┼───┼───┘
+      │       │   │
+      │ 1     │   │
+      │       │   │
+      │ 1     │   │
+┌─────┴──────┐│   │
+│ user_notes ││   │
+└────────────┘│   │
+      │ 1     │ 1 │ 1
+┌─────┴────────┴───┴───┐
+│     team_notes       │
+└──────────┬───────────┘
+           │ 1
+     ┌─────┴──────┐
+     │group_notes │
+     └────────────┘
 ```
 
 ## データの関係性
@@ -267,6 +342,9 @@ Soccer Note アプリケーションのデータベース設計ドキュメン�
 
 -   Team (1) → Groups (N)
 -   User (1) → Notes (N) (作成者として)
+-   Note (1) → UserNote (1) (個人ノートとして)
+-   Note (1) → TeamNote (1) (チームノートとして)
+-   Note (1) → GroupNote (1) (グループノートとして)
 
 ### 多対多の関係
 
@@ -274,9 +352,14 @@ Soccer Note アプリケーションのデータベース設計ドキュメン�
 -   Group (N) ↔ User (N) (group_user テーブル経由)
 -   Role (N) ↔ Permission (N) (role_permissions テーブル経由)
 
-### ポリモーフィック関係
+### 中間テーブルによる紐付け
 
--   Note → Notable (User | Team | Group)
+-   User (N) ↔ Note (N) (user_notes テーブル経由、個人ノート)
+-   Team (N) ↔ Note (N) (team_notes テーブル経由、チームノート)
+-   Group (N) ↔ Note (N) (group_notes テーブル経由、グループノート)
+
+**重要**: 1 つのノートは必ず 1 つのエンティティ (User, Team, Group のいずれか) に紐づく。
+複数のエンティティに同時に紐づくことはない (note_id に UNIQUE 制約)
 
 ## 使用例
 
@@ -307,13 +390,44 @@ $hasPermission = $role->permissions->contains('name', 'edit_notes');
 ### ユースケース 4: チームノートの作成
 
 ```php
+// ノートを作成
 $note = Note::create([
     'user_id' => $userId,
-    'notable_type' => 'team',
-    'notable_id' => $teamId,
     'title' => 'チーム練習メモ',
     'content' => '本日の練習内容...',
 ]);
+
+// チームと紐付け
+TeamNote::create([
+    'note_id' => $note->id,
+    'team_id' => $teamId,
+]);
+```
+
+### ユースケース 5: チームに紐づくノート一覧を取得
+
+```php
+$team = Team::find(1);
+$notes = Note::whereHas('teamNote', function($query) use ($team) {
+    $query->where('team_id', $team->id);
+})->get();
+
+// またはリレーション経由で
+$notes = $team->notes; // Team モデルに hasManyThrough リレーションを定義した場合
+```
+
+### ユースケース 6: ノートがどのエンティティに紐づいているか確認
+
+```php
+$note = Note::find(1);
+
+if ($note->userNote) {
+    echo '個人ノート: ' . $note->userNote->user->name;
+} elseif ($note->teamNote) {
+    echo 'チームノート: ' . $note->teamNote->team->name;
+} elseif ($note->groupNote) {
+    echo 'グループノート: ' . $note->groupNote->group->name;
+}
 ```
 
 ## マイグレーション実行順序
@@ -326,6 +440,9 @@ $note = Note::create([
 6. `team_user` テーブル
 7. `group_user` テーブル
 8. `notes` テーブルの拡張 (既存テーブルの場合は ALTER)
+9. `user_notes` テーブル
+10. `team_notes` テーブル
+11. `group_notes` テーブル
 
 ## 注意事項
 
