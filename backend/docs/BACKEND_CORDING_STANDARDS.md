@@ -6,17 +6,17 @@
 
 ## Table of Contents
 
-- [General Principles](#general-principles)
-- [Architecture](#architecture)
-- [Controllers](#controllers)
-- [Use Cases (Actions)](#use-cases-actions)
-- [Models](#models)
-- [Request Validation](#request-validation)
-- [OpenAPI Documentation](#openapi-documentation)
-- [Database](#database)
-- [Error Handling](#error-handling)
-- [Testing](#testing)
-- [Best Practices](#best-practices)
+-   [General Principles](#general-principles)
+-   [Architecture](#architecture)
+-   [Controllers](#controllers)
+-   [Use Cases (Actions)](#use-cases-actions)
+-   [Models](#models)
+-   [Request Validation](#request-validation)
+-   [OpenAPI Documentation](#openapi-documentation)
+-   [Database](#database)
+-   [Error Handling](#error-handling)
+-   [Testing](#testing)
+-   [Best Practices](#best-practices)
 
 ## General Principles
 
@@ -38,11 +38,11 @@ namespace App\Http\Controllers\Api\V1;
 
 Laravel の PSR-4 オートローディング規約に従ってください。
 
-- Controllers: `App\Http\Controllers\Api\V1\`
-- Models: `App\Models\`
-- Use Cases: `App\UseCase\{Feature}\`
-- Requests: `App\Http\Requests\{Feature}\`
-- Traits: `App\Traits\`
+-   Controllers: `App\Http\Controllers\Api\V1\`
+-   Models: `App\Models\`
+-   Use Cases: `App\UseCase\{Feature}\`
+-   Requests: `App\Http\Requests\{Feature}\`
+-   Traits: `App\Traits\`
 
 ### Type Hints
 
@@ -158,12 +158,12 @@ return response()->json($data, 200);
 
 適切な HTTP ステータスコードを使用してください：
 
-- `200 OK`: 正常な取得・更新
-- `201 Created`: リソースの作成成功
-- `204 No Content`: 削除成功（レスポンスボディなし）
-- `401 Unauthorized`: 認証エラー
-- `404 Not Found`: リソースが見つからない
-- `422 Unprocessable Entity`: バリデーションエラー
+-   `200 OK`: 正常な取得・更新
+-   `201 Created`: リソースの作成成功
+-   `204 No Content`: 削除成功（レスポンスボディなし）
+-   `401 Unauthorized`: 認証エラー
+-   `404 Not Found`: リソースが見つからない
+-   `422 Unprocessable Entity`: バリデーションエラー
 
 ### Sqid and Numeric ID Support
 
@@ -200,8 +200,8 @@ public function show(string $id, Request $request, GetNoteAction $action): JsonR
 
 ビジネスロジックは Use Case として Action クラスに実装してください。
 
-- 配置場所: `app/UseCase/{Feature}/{ActionName}.php`
-- 命名規則: `{Verb}{Feature}Action` (例: `CreateNoteAction`, `GetNotesAction`)
+-   配置場所: `app/UseCase/{Feature}/{ActionName}.php`
+-   命名規則: `{Verb}{Feature}Action` (例: `CreateNoteAction`, `GetNotesAction`)
 
 ### Single Responsibility
 
@@ -235,10 +235,10 @@ class CreateNoteAction
 
 Action は以下のいずれかを返してください：
 
-- Model インスタンス
-- Collection
-- 配列
-- `null`（見つからない場合）
+-   Model インスタンス
+-   Collection
+-   配列
+-   `null`（見つからない場合）
 
 エラーハンドリングは Controller 層で行います。
 
@@ -270,10 +270,10 @@ public function execute(int $noteId, int $userId): Note
 
 モデルには以下のプロパティを適切に定義してください：
 
-- `$fillable`: マスアサインメント可能な属性
-- `$hidden`: JSON シリアライズ時に隠す属性
-- `$casts`: 属性の型キャスト
-- `$appends`: JSON に自動追加する属性
+-   `$fillable`: マスアサインメント可能な属性
+-   `$hidden`: JSON シリアライズ時に隠す属性
+-   `$casts`: 属性の型キャスト
+-   `$appends`: JSON に自動追加する属性
 
 ```php
 // ✅ Good: プロパティが適切に定義されている
@@ -349,8 +349,8 @@ $sqid = $note->sqid; // アクセサーで取得
 
 バリデーションは必ず Form Request クラスを使用してください。
 
-- 配置場所: `app/Http/Requests/{Feature}/{ActionName}Request.php`
-- 命名規則: `{ActionName}Request` (例: `CreateNoteRequest`, `UpdateNoteRequest`)
+-   配置場所: `app/Http/Requests/{Feature}/{ActionName}Request.php`
+-   命名規則: `{ActionName}Request` (例: `CreateNoteRequest`, `UpdateNoteRequest`)
 
 ```php
 // ✅ Good: Form Request クラスを使用
@@ -422,10 +422,10 @@ class NoteController extends Controller
 
 各エンドポイントに以下を記述してください：
 
-- `#[OA\{Method}]`: HTTP メソッドとパス
-- `#[OA\RequestBody]`: リクエストボディ（POST/PUT の場合）
-- `#[OA\Response]`: 各ステータスコードのレスポンス
-- `#[OA\Parameter]`: パスパラメータやクエリパラメータ
+-   `#[OA\{Method}]`: HTTP メソッドとパス
+-   `#[OA\RequestBody]`: リクエストボディ（POST/PUT の場合）
+-   `#[OA\Response]`: 各ステータスコードのレスポンス
+-   `#[OA\Parameter]`: パスパラメータやクエリパラメータ
 
 ```php
 #[OA\Post(
@@ -513,21 +513,22 @@ make api
 
 マイグレーションファイルには以下を含めてください：
 
-- テーブル名
-- カラム定義（型、NULL 可否、デフォルト値）
-- インデックス
-- 外部キー制約
-- タイムスタンプ
+-   テーブル名
+-   カラム定義（型、NULL 可否、デフォルト値）
+-   **カラムコメント（`comment()` メソッド）**
+-   インデックス
+-   外部キー制約
+-   タイムスタンプ
 
 ```php
 public function up(): void
 {
     Schema::create('notes', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('user_id')->constrained()->onDelete('cascade');
-        $table->string('title');
-        $table->date('date');
-        $table->text('content');
+        $table->id()->comment('ノートID');
+        $table->foreignId('user_id')->constrained()->onDelete('cascade')->comment('作成者のユーザーID');
+        $table->string('title')->comment('タイトル');
+        $table->date('date')->comment('日付');
+        $table->text('content')->comment('内容');
         $table->timestamps();
         $table->softDeletes();
 
@@ -618,7 +619,7 @@ if ($result === null) {
 
 API エンドポイントには必ず Feature Test を書いてください。
 
-- 配置場所: `tests/Feature/{Feature}/`
+-   配置場所: `tests/Feature/{Feature}/`
 
 ```php
 // tests/Feature/Note/CreateNoteTest.php
@@ -686,10 +687,10 @@ $response = $this->actingAs($user)
 
 Laravel の命名規約とベストプラクティスに従ってください：
 
-- テーブル名: 複数形のスネークケース（`notes`, `users`）
-- モデル名: 単数形のパスカルケース（`Note`, `User`）
-- コントローラー名: `{Model}Controller`
-- 変数名: キャメルケース（`$userId`, `$noteId`）
+-   テーブル名: 複数形のスネークケース（`notes`, `users`）
+-   モデル名: 単数形のパスカルケース（`Note`, `User`）
+-   コントローラー名: `{Model}Controller`
+-   変数名: キャメルケース（`$userId`, `$noteId`）
 
 ### Avoid Over-Engineering
 
@@ -728,16 +729,16 @@ make pint
 
 ### Security
 
-- パスワードは必ずハッシュ化してください（`bcrypt` または `Hash::make`）
-- ユーザー入力は必ずバリデーションしてください
-- SQL インジェクション対策として Eloquent ORM を使用してください
-- 認証が必要なエンドポイントには `security: [['sanctum' => []]]` を記述してください
+-   パスワードは必ずハッシュ化してください（`bcrypt` または `Hash::make`）
+-   ユーザー入力は必ずバリデーションしてください
+-   SQL インジェクション対策として Eloquent ORM を使用してください
+-   認証が必要なエンドポイントには `security: [['sanctum' => []]]` を記述してください
 
 ### Performance
 
-- N+1 問題を避けるため、Eager Loading を使用してください
-- 大量のデータを扱う場合は Pagination を使用してください
-- インデックスを適切に設定してください
+-   N+1 問題を避けるため、Eager Loading を使用してください
+-   大量のデータを扱う場合は Pagination を使用してください
+-   インデックスを適切に設定してください
 
 ```php
 // ✅ Good: Eager Loading
@@ -752,16 +753,16 @@ foreach ($notes as $note) {
 
 ## Summary
 
-- ✅ すべてのファイルに `declare(strict_types=1);` を記述
-- ✅ 型ヒントを必ず記述（引数・戻り値）
-- ✅ レイヤードアーキテクチャに従う（Controller → Action → Model）
-- ✅ ビジネスロジックは Action クラスに実装
-- ✅ Form Request でバリデーション
-- ✅ OpenAPI アトリビュートで API ドキュメント化
-- ✅ JSON レスポンスに `JSON_UNESCAPED_UNICODE` を指定
-- ✅ Sqid と数値 ID の両方をサポート
-- ✅ 論理削除（Soft Deletes）を使用
-- ✅ Feature Test を書く
-- ✅ エラーメッセージは日本語でわかりやすく
+-   ✅ すべてのファイルに `declare(strict_types=1);` を記述
+-   ✅ 型ヒントを必ず記述（引数・戻り値）
+-   ✅ レイヤードアーキテクチャに従う（Controller → Action → Model）
+-   ✅ ビジネスロジックは Action クラスに実装
+-   ✅ Form Request でバリデーション
+-   ✅ OpenAPI アトリビュートで API ドキュメント化
+-   ✅ JSON レスポンスに `JSON_UNESCAPED_UNICODE` を指定
+-   ✅ Sqid と数値 ID の両方をサポート
+-   ✅ 論理削除（Soft Deletes）を使用
+-   ✅ Feature Test を書く
+-   ✅ エラーメッセージは日本語でわかりやすく
 
 これらの規約に従うことで、コードベースの一貫性と保守性が向上します。
