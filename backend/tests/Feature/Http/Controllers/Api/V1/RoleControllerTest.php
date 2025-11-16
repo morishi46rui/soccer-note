@@ -20,7 +20,8 @@ class RoleControllerTest extends TestCase
         $this->user = User::factory()->create();
 
         // シーダーを実行してロールと権限を作成
-        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RoleSeeder::class);
     }
 
     public function test_it_returns_all_roles_with_permissions(): void
@@ -50,7 +51,7 @@ class RoleControllerTest extends TestCase
                     ],
                 ],
             ])
-            ->assertJsonCount(4); // player, coach, manager, admin
+            ->assertJsonCount(3); // player, coach, admin
     }
 
     public function test_it_returns_correct_role_data(): void
@@ -69,10 +70,6 @@ class RoleControllerTest extends TestCase
                 'display_name' => 'コーチ',
             ])
             ->assertJsonFragment([
-                'name' => 'manager',
-                'display_name' => 'マネージャー',
-            ])
-            ->assertJsonFragment([
                 'name' => 'admin',
                 'display_name' => '管理者',
             ]);
@@ -88,8 +85,13 @@ class RoleControllerTest extends TestCase
         $playerRole = collect($responseData)->firstWhere('name', 'player');
 
         $this->assertNotNull($playerRole);
-        $this->assertCount(1, $playerRole['permissions']);
-        $this->assertEquals('view_notes', $playerRole['permissions'][0]['name']);
+        $this->assertCount(4, $playerRole['permissions']); // view_notes, view_team, view_group, view_members
+
+        $permissionNames = collect($playerRole['permissions'])->pluck('name')->toArray();
+        $this->assertContains('view_notes', $permissionNames);
+        $this->assertContains('view_team', $permissionNames);
+        $this->assertContains('view_group', $permissionNames);
+        $this->assertContains('view_members', $permissionNames);
     }
 
     public function test_it_returns_coach_role_with_correct_permissions(): void
@@ -102,12 +104,24 @@ class RoleControllerTest extends TestCase
         $coachRole = collect($responseData)->firstWhere('name', 'coach');
 
         $this->assertNotNull($coachRole);
-        $this->assertCount(3, $coachRole['permissions']);
+        $this->assertCount(11, $coachRole['permissions']);
 
         $permissionNames = collect($coachRole['permissions'])->pluck('name')->toArray();
+        // ノート関連
         $this->assertContains('view_notes', $permissionNames);
+        $this->assertContains('create_notes', $permissionNames);
         $this->assertContains('edit_notes', $permissionNames);
         $this->assertContains('delete_notes', $permissionNames);
+        // チーム閲覧
+        $this->assertContains('view_team', $permissionNames);
+        // グループ全操作
+        $this->assertContains('view_group', $permissionNames);
+        $this->assertContains('create_group', $permissionNames);
+        $this->assertContains('edit_group', $permissionNames);
+        $this->assertContains('delete_group', $permissionNames);
+        // メンバー閲覧・編集
+        $this->assertContains('view_members', $permissionNames);
+        $this->assertContains('edit_members', $permissionNames);
     }
 
     public function test_it_returns_admin_role_with_all_permissions(): void
@@ -120,7 +134,7 @@ class RoleControllerTest extends TestCase
         $adminRole = collect($responseData)->firstWhere('name', 'admin');
 
         $this->assertNotNull($adminRole);
-        $this->assertCount(6, $adminRole['permissions']); // すべての権限
+        $this->assertCount(16, $adminRole['permissions']); // すべての権限
     }
 
     public function test_it_requires_authentication(): void

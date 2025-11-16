@@ -22,7 +22,8 @@ class GetRolesActionTest extends TestCase
         $this->action = new GetRolesAction;
 
         // シーダーを実行してロールと権限を作成
-        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RoleSeeder::class);
     }
 
     public function test_it_returns_all_roles(): void
@@ -32,7 +33,7 @@ class GetRolesActionTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(Collection::class, $result);
-        $this->assertCount(4, $result); // player, coach, manager, admin
+        $this->assertCount(3, $result); // player, coach, admin
     }
 
     public function test_it_returns_roles_with_permissions(): void
@@ -41,6 +42,7 @@ class GetRolesActionTest extends TestCase
         $result = $this->action->execute();
 
         // Assert
+        /** @var Role $role */
         foreach ($result as $role) {
             $this->assertNotNull($role->permissions);
             $this->assertInstanceOf(Collection::class, $role->permissions);
@@ -56,8 +58,13 @@ class GetRolesActionTest extends TestCase
         // Assert
         $this->assertNotNull($playerRole);
         $this->assertEquals('選手', $playerRole->display_name);
-        $this->assertCount(1, $playerRole->permissions);
-        $this->assertEquals('view_notes', $playerRole->permissions->first()->name);
+        $this->assertCount(4, $playerRole->permissions); // view_notes, view_team, view_group, view_members
+
+        $permissionNames = $playerRole->permissions->pluck('name')->toArray();
+        $this->assertContains('view_notes', $permissionNames);
+        $this->assertContains('view_team', $permissionNames);
+        $this->assertContains('view_group', $permissionNames);
+        $this->assertContains('view_members', $permissionNames);
     }
 
     public function test_it_returns_coach_role_with_correct_permissions(): void
@@ -69,29 +76,24 @@ class GetRolesActionTest extends TestCase
         // Assert
         $this->assertNotNull($coachRole);
         $this->assertEquals('コーチ', $coachRole->display_name);
-        $this->assertCount(3, $coachRole->permissions);
+        $this->assertCount(11, $coachRole->permissions);
 
         $permissionNames = $coachRole->permissions->pluck('name')->toArray();
+        // ノート関連
         $this->assertContains('view_notes', $permissionNames);
+        $this->assertContains('create_notes', $permissionNames);
         $this->assertContains('edit_notes', $permissionNames);
         $this->assertContains('delete_notes', $permissionNames);
-    }
-
-    public function test_it_returns_manager_role_with_correct_permissions(): void
-    {
-        // Act
-        $result = $this->action->execute();
-        $managerRole = $result->firstWhere('name', 'manager');
-
-        // Assert
-        $this->assertNotNull($managerRole);
-        $this->assertEquals('マネージャー', $managerRole->display_name);
-        $this->assertCount(3, $managerRole->permissions);
-
-        $permissionNames = $managerRole->permissions->pluck('name')->toArray();
-        $this->assertContains('view_notes', $permissionNames);
-        $this->assertContains('edit_notes', $permissionNames);
-        $this->assertContains('manage_group', $permissionNames);
+        // チーム閲覧
+        $this->assertContains('view_team', $permissionNames);
+        // グループ全操作
+        $this->assertContains('view_group', $permissionNames);
+        $this->assertContains('create_group', $permissionNames);
+        $this->assertContains('edit_group', $permissionNames);
+        $this->assertContains('delete_group', $permissionNames);
+        // メンバー閲覧・編集
+        $this->assertContains('view_members', $permissionNames);
+        $this->assertContains('edit_members', $permissionNames);
     }
 
     public function test_it_returns_admin_role_with_all_permissions(): void
@@ -103,15 +105,29 @@ class GetRolesActionTest extends TestCase
         // Assert
         $this->assertNotNull($adminRole);
         $this->assertEquals('管理者', $adminRole->display_name);
-        $this->assertCount(6, $adminRole->permissions); // すべての権限
+        $this->assertCount(16, $adminRole->permissions); // すべての権限
 
         $permissionNames = $adminRole->permissions->pluck('name')->toArray();
+        // ノート関連
         $this->assertContains('view_notes', $permissionNames);
+        $this->assertContains('create_notes', $permissionNames);
         $this->assertContains('edit_notes', $permissionNames);
         $this->assertContains('delete_notes', $permissionNames);
-        $this->assertContains('manage_team', $permissionNames);
-        $this->assertContains('manage_group', $permissionNames);
-        $this->assertContains('manage_members', $permissionNames);
+        // チーム関連
+        $this->assertContains('view_team', $permissionNames);
+        $this->assertContains('create_team', $permissionNames);
+        $this->assertContains('edit_team', $permissionNames);
+        $this->assertContains('delete_team', $permissionNames);
+        // グループ関連
+        $this->assertContains('view_group', $permissionNames);
+        $this->assertContains('create_group', $permissionNames);
+        $this->assertContains('edit_group', $permissionNames);
+        $this->assertContains('delete_group', $permissionNames);
+        // メンバー関連
+        $this->assertContains('view_members', $permissionNames);
+        $this->assertContains('add_members', $permissionNames);
+        $this->assertContains('edit_members', $permissionNames);
+        $this->assertContains('remove_members', $permissionNames);
     }
 
     public function test_it_returns_empty_collection_when_no_roles_exist(): void

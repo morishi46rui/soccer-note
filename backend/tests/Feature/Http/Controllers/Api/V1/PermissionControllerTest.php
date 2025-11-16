@@ -20,7 +20,8 @@ class PermissionControllerTest extends TestCase
         $this->user = User::factory()->create();
 
         // シーダーを実行して権限を作成
-        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RoleSeeder::class);
     }
 
     public function test_it_returns_all_permissions(): void
@@ -40,7 +41,7 @@ class PermissionControllerTest extends TestCase
                     'updated_at',
                 ],
             ])
-            ->assertJsonCount(6); // 6つの権限
+            ->assertJsonCount(16); // 16つの権限
     }
 
     public function test_it_returns_correct_permission_data(): void
@@ -48,11 +49,15 @@ class PermissionControllerTest extends TestCase
         // Act
         $response = $this->actingAs($this->user)->getJson('/api/v1/permissions');
 
-        // Assert
+        // Assert - ノート関連
         $response->assertOk()
             ->assertJsonFragment([
                 'name' => 'view_notes',
                 'display_name' => 'ノート閲覧',
+            ])
+            ->assertJsonFragment([
+                'name' => 'create_notes',
+                'display_name' => 'ノート作成',
             ])
             ->assertJsonFragment([
                 'name' => 'edit_notes',
@@ -62,17 +67,32 @@ class PermissionControllerTest extends TestCase
                 'name' => 'delete_notes',
                 'display_name' => 'ノート削除',
             ])
+            // Assert - チーム関連
             ->assertJsonFragment([
-                'name' => 'manage_team',
-                'display_name' => 'チーム管理',
+                'name' => 'view_team',
+                'display_name' => 'チーム閲覧',
             ])
             ->assertJsonFragment([
-                'name' => 'manage_group',
-                'display_name' => 'グループ管理',
+                'name' => 'create_team',
+                'display_name' => 'チーム作成',
+            ])
+            // Assert - グループ関連
+            ->assertJsonFragment([
+                'name' => 'view_group',
+                'display_name' => 'グループ閲覧',
             ])
             ->assertJsonFragment([
-                'name' => 'manage_members',
-                'display_name' => 'メンバー管理',
+                'name' => 'create_group',
+                'display_name' => 'グループ作成',
+            ])
+            // Assert - メンバー関連
+            ->assertJsonFragment([
+                'name' => 'view_members',
+                'display_name' => 'メンバー閲覧',
+            ])
+            ->assertJsonFragment([
+                'name' => 'add_members',
+                'display_name' => 'メンバー追加',
             ]);
     }
 

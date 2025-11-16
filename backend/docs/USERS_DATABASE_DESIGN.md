@@ -97,10 +97,9 @@ Soccer Note アプリケーションのデータベース設計ドキュメン�
 
 **初期データ例**
 
+-   admin: 管理者
 -   player: 選手
 -   coach: コーチ
--   manager: マネージャー
--   admin: 管理者
 
 ---
 

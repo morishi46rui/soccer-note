@@ -22,7 +22,8 @@ class GetPermissionsActionTest extends TestCase
         $this->action = new GetPermissionsAction;
 
         // シーダーを実行して権限を作成
-        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RoleSeeder::class);
     }
 
     public function test_it_returns_all_permissions(): void
@@ -32,7 +33,7 @@ class GetPermissionsActionTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(Collection::class, $result);
-        $this->assertCount(6, $result); // 6つの権限
+        $this->assertCount(16, $result); // 16つの権限
     }
 
     public function test_it_returns_correct_permission_names(): void
@@ -41,13 +42,29 @@ class GetPermissionsActionTest extends TestCase
         $result = $this->action->execute();
         $permissionNames = $result->pluck('name')->toArray();
 
-        // Assert
+        // Assert - ノート関連
         $this->assertContains('view_notes', $permissionNames);
+        $this->assertContains('create_notes', $permissionNames);
         $this->assertContains('edit_notes', $permissionNames);
         $this->assertContains('delete_notes', $permissionNames);
-        $this->assertContains('manage_team', $permissionNames);
-        $this->assertContains('manage_group', $permissionNames);
-        $this->assertContains('manage_members', $permissionNames);
+
+        // Assert - チーム関連
+        $this->assertContains('view_team', $permissionNames);
+        $this->assertContains('create_team', $permissionNames);
+        $this->assertContains('edit_team', $permissionNames);
+        $this->assertContains('delete_team', $permissionNames);
+
+        // Assert - グループ関連
+        $this->assertContains('view_group', $permissionNames);
+        $this->assertContains('create_group', $permissionNames);
+        $this->assertContains('edit_group', $permissionNames);
+        $this->assertContains('delete_group', $permissionNames);
+
+        // Assert - メンバー関連
+        $this->assertContains('view_members', $permissionNames);
+        $this->assertContains('add_members', $permissionNames);
+        $this->assertContains('edit_members', $permissionNames);
+        $this->assertContains('remove_members', $permissionNames);
     }
 
     public function test_it_returns_permissions_with_display_names(): void
@@ -56,6 +73,7 @@ class GetPermissionsActionTest extends TestCase
         $result = $this->action->execute();
 
         // Assert
+        /** @var Permission $permission */
         foreach ($result as $permission) {
             $this->assertNotNull($permission->name);
             $this->assertNotNull($permission->display_name);
@@ -76,16 +94,16 @@ class GetPermissionsActionTest extends TestCase
         $this->assertEquals('ノートを閲覧できる', $viewNotesPermission->description);
     }
 
-    public function test_it_returns_manage_team_permission_with_correct_data(): void
+    public function test_it_returns_view_team_permission_with_correct_data(): void
     {
         // Act
         $result = $this->action->execute();
-        $manageTeamPermission = $result->firstWhere('name', 'manage_team');
+        $viewTeamPermission = $result->firstWhere('name', 'view_team');
 
         // Assert
-        $this->assertNotNull($manageTeamPermission);
-        $this->assertEquals('チーム管理', $manageTeamPermission->display_name);
-        $this->assertEquals('チームを管理できる', $manageTeamPermission->description);
+        $this->assertNotNull($viewTeamPermission);
+        $this->assertEquals('チーム閲覧', $viewTeamPermission->display_name);
+        $this->assertEquals('チーム情報を閲覧できる', $viewTeamPermission->description);
     }
 
     public function test_it_returns_empty_collection_when_no_permissions_exist(): void
