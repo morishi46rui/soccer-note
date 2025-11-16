@@ -16,6 +16,14 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         // ロールの作成
+        $admin = Role::firstOrCreate(
+            ['name' => 'admin'],
+            [
+                'display_name' => '管理者',
+                'description' => 'チームの管理者',
+            ]
+        );
+
         $player = Role::firstOrCreate(
             ['name' => 'player'],
             [
@@ -32,12 +40,9 @@ class RoleSeeder extends Seeder
             ]
         );
 
-        $admin = Role::firstOrCreate(
-            ['name' => 'admin'],
-            [
-                'display_name' => '管理者',
-                'description' => 'チームの管理者',
-            ]
+        // 管理者: すべての権限
+        $admin->permissions()->sync(
+            Permission::all()->pluck('id')
         );
 
         // ロールと権限の紐付け
@@ -68,9 +73,5 @@ class RoleSeeder extends Seeder
             ])->pluck('id')
         );
 
-        // 管理者: すべての権限
-        $admin->permissions()->sync(
-            Permission::all()->pluck('id')
-        );
     }
 }
