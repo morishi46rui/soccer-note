@@ -113,12 +113,6 @@ fresh:
 	@docker-compose exec app php artisan migrate:fresh --seed
 	@echo "==> データベースのリフレッシュが完了しました"
 
-# テスト実行
-test:
-	@echo "==> テストを実行中..."
-	@docker-compose exec app php artisan test
-	@echo "==> テストが完了しました"
-
 # シェルに入る
 bashb:
 	@docker-compose exec app bash
