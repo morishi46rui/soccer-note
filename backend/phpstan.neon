@@ -1,0 +1,9 @@
+includes:
+    - ./vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app/
+
+    # Rule level (0-9, 9が最も厳格)
+    level: 5

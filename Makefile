@@ -1,4 +1,4 @@
-.PHONY: help init up down re build logs ps clean clean-deps install migrate seed fresh test testb lintb fixb b db-shell npm-dev npm-build artisan composer npm copy-vendor f frontend-logs
+.PHONY: help init up down re build logs ps clean clean-deps install migrate seed fresh test testb lintb analyzeb fixb b db-shell npm-dev npm-build artisan composer npm copy-vendor f frontend-logs
 
 # デフォルトのターゲット
 .DEFAULT_GOAL := help
@@ -28,7 +28,8 @@ help:
 	@echo "  make api          - API関連ファイルを自動生成(ルーティング・Swagger・型定義)"
 	@echo "  make testb        - バックエンドのテストを実行"
 	@echo "  make lintb        - バックエンドのコードをLintチェック（Laravel Pint）"
-	@echo "  make fixb         - バックエンドのテスト実行とLint自動修正"
+	@echo "  make analyzeb     - バックエンドの静的解析を実行（PHPStan/Larastan）"
+	@echo "  make fixb         - バックエンドのテスト・静的解析・Lint自動修正"
 
 # 初回環境構築
 init:
@@ -198,10 +199,19 @@ lintb:
 	@docker-compose exec app ./vendor/bin/pint
 	@echo "==> Lintチェックが完了しました"
 
-# バックエンドのテスト実行とLint自動修正
+# バックエンドの静的解析
+analyzeb:
+	@echo "==> バックエンドの静的解析を実行中..."
+	@docker-compose exec app ./vendor/bin/phpstan analyse --memory-limit=2G
+	@echo "==> 静的解析が完了しました"
+
+# バックエンドのテスト・静的解析・Lint自動修正
 fixb:
-	@echo "==> コードを自動修正中..."
+	@echo "==> バックエンドのコード修正とチェックを実行中..."
+	@echo "==> 1. コードを自動修正中..."
 	@make lintb
-	@echo "==> バックエンドのテストとLint修正を実行中..."
+	@echo "==> 2. 静的解析を実行中..."
+	@make analyzeb
+	@echo "==> 3. テストを実行中..."
 	@make testb
 	@echo "==> すべての処理が完了しました"
