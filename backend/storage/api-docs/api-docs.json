@@ -481,6 +481,171 @@
                     }
                 ]
             }
+        },
+        "/api/v1/permissions": {
+            "get": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "権限一覧取得",
+                "description": "すべての権限を取得します",
+                "operationId": "getPermissions",
+                "responses": {
+                    "200": {
+                        "description": "取得成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "description": "権限ID",
+                                                "type": "integer",
+                                                "format": "int64",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "description": "権限識別子",
+                                                "type": "string",
+                                                "example": "view_notes"
+                                            },
+                                            "display_name": {
+                                                "description": "表示名",
+                                                "type": "string",
+                                                "example": "ノート閲覧"
+                                            },
+                                            "description": {
+                                                "description": "権限の説明",
+                                                "type": "string",
+                                                "example": "ノートを閲覧できる",
+                                                "nullable": true
+                                            },
+                                            "created_at": {
+                                                "description": "作成日時",
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "description": "更新日時",
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/roles": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "ロール一覧取得",
+                "description": "すべてのロールと関連する権限を取得します",
+                "operationId": "getRoles",
+                "responses": {
+                    "200": {
+                        "description": "取得成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "description": "ロールID",
+                                                "type": "integer",
+                                                "format": "int64",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "description": "ロール識別子",
+                                                "type": "string",
+                                                "example": "player"
+                                            },
+                                            "display_name": {
+                                                "description": "表示名",
+                                                "type": "string",
+                                                "example": "選手"
+                                            },
+                                            "description": {
+                                                "description": "ロールの説明",
+                                                "type": "string",
+                                                "example": "チームの選手",
+                                                "nullable": true
+                                            },
+                                            "permissions": {
+                                                "description": "このロールが持つ権限",
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "description": "権限ID",
+                                                            "type": "integer",
+                                                            "format": "int64",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "description": "権限識別子",
+                                                            "type": "string",
+                                                            "example": "view_notes"
+                                                        },
+                                                        "display_name": {
+                                                            "description": "表示名",
+                                                            "type": "string",
+                                                            "example": "ノート閲覧"
+                                                        },
+                                                        "description": {
+                                                            "description": "権限の説明",
+                                                            "type": "string",
+                                                            "example": "ノートを閲覧できる",
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "created_at": {
+                                                "description": "作成日時",
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "description": "更新日時",
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -1067,6 +1232,14 @@
         {
             "name": "Notes",
             "description": "ノート管理"
+        },
+        {
+            "name": "Permissions",
+            "description": "権限管理"
+        },
+        {
+            "name": "Roles",
+            "description": "ロール管理"
         }
     ]
 }
