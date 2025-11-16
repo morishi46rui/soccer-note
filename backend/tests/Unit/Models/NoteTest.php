@@ -24,7 +24,7 @@ class NoteTest extends TestCase
         ];
 
         // Act
-        $note = new Note();
+        $note = new Note;
 
         // Assert
         $this->assertEquals($attributes, $note->getFillable());
@@ -40,7 +40,7 @@ class NoteTest extends TestCase
         ];
 
         // Act
-        $note = new Note();
+        $note = new Note;
 
         // Assert
         foreach ($expectedCasts as $attribute => $cast) {

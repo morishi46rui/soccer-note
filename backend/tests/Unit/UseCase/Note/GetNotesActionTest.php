@@ -20,7 +20,7 @@ class GetNotesActionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->action = new GetNotesAction();
+        $this->action = new GetNotesAction;
     }
 
     public function test_it_returns_paginated_notes_for_user(): void
@@ -55,7 +55,7 @@ class GetNotesActionTest extends TestCase
 
         // Act
         $result = $this->action->execute($user->id, 1, 10);
-        $dates = collect($result->items())->pluck('date')->map(fn($date) => $date->format('Y-m-d'))->toArray();
+        $dates = collect($result->items())->pluck('date')->map(fn ($date) => $date->format('Y-m-d'))->toArray();
 
         // Assert
         $this->assertEquals(['2025-01-03', '2025-01-02', '2025-01-01'], $dates);

@@ -19,7 +19,7 @@ class DeleteNoteActionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->action = new DeleteNoteAction();
+        $this->action = new DeleteNoteAction;
     }
 
     public function test_it_soft_deletes_note(): void

@@ -20,6 +20,4 @@ use OpenApi\Attributes as OA;
     description: '1ページあたりの件数',
     schema: new OA\Schema(type: 'integer', default: 15)
 )]
-class PaginationParameters
-{
-}
+class PaginationParameters {}

@@ -19,7 +19,7 @@ class CreateNoteActionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->action = new CreateNoteAction();
+        $this->action = new CreateNoteAction;
     }
 
     public function test_it_creates_note_with_valid_data(): void

@@ -52,7 +52,7 @@ trait HasSqid
         $model = static::findBySqid($sqid);
 
         if ($model === null) {
-            throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException;
         }
 
         return $model;

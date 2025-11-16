@@ -1,4 +1,4 @@
-.PHONY: help init up down re build logs ps clean clean-deps install migrate seed fresh test b db-shell npm-dev npm-build artisan composer npm copy-vendor f frontend-logs
+.PHONY: help init up down re build logs ps clean clean-deps install migrate seed fresh test testb lintb fixb b db-shell npm-dev npm-build artisan composer npm copy-vendor f frontend-logs
 
 # デフォルトのターゲット
 .DEFAULT_GOAL := help
@@ -26,6 +26,9 @@ help:
 	@echo "  make npm-build    - npm run buildを実行"
 	@echo "  make swagger      - Swaggerドキュメントを生成"
 	@echo "  make api          - API関連ファイルを自動生成(ルーティング・Swagger・型定義)"
+	@echo "  make testb        - バックエンドのテストを実行"
+	@echo "  make lintb        - バックエンドのコードをLintチェック（Laravel Pint）"
+	@echo "  make fixb         - バックエンドのテスト実行とLint自動修正"
 
 # 初回環境構築
 init:
@@ -182,3 +185,23 @@ api:
 	@npx openapi-typescript backend/storage/api-docs/api-docs.json -o frontend/src/types/api.ts 2>/dev/null || echo "TypeScript型定義の生成をスキップ (openapi-typescriptが未インストール)"
 	@echo "==> API関連ファイルの生成が完了しました"
 	@echo "==> Swagger UI: http://localhost:8000/api/documentation"
+
+# バックエンドのテスト実行
+testb:
+	@echo "==> バックエンドのテストを実行中..."
+	@docker-compose exec app php artisan test
+	@echo "==> テストが完了しました"
+
+# バックエンドのLintチェック
+lintb:
+	@echo "==> バックエンドのコードをLintチェック中..."
+	@docker-compose exec app ./vendor/bin/pint
+	@echo "==> Lintチェックが完了しました"
+
+# バックエンドのテスト実行とLint自動修正
+fixb:
+	@echo "==> コードを自動修正中..."
+	@make lintb
+	@echo "==> バックエンドのテストとLint修正を実行中..."
+	@make testb
+	@echo "==> すべての処理が完了しました"

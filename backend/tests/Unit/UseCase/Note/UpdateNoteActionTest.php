@@ -19,7 +19,7 @@ class UpdateNoteActionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->action = new UpdateNoteAction();
+        $this->action = new UpdateNoteAction;
     }
 
     public function test_it_updates_note_with_valid_data(): void

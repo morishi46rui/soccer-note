@@ -45,6 +45,4 @@ use OpenApi\Attributes as OA;
         ]
     )
 )]
-class ErrorResponses
-{
-}
+class ErrorResponses {}

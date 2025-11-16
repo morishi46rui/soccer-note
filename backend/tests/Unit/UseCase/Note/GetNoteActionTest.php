@@ -19,7 +19,7 @@ class GetNoteActionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->action = new GetNoteAction();
+        $this->action = new GetNoteAction;
     }
 
     public function test_it_returns_note_for_authorized_user(): void
