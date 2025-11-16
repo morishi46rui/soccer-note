@@ -228,7 +228,7 @@ class TeamControllerTest extends TestCase
 
         // Assert
         $response->assertNoContent();
-        $this->assertDatabaseMissing('teams', ['id' => $team->id]);
+        $this->assertSoftDeleted('teams', ['id' => $team->id]);
     }
 
     public function test_it_returns_404_when_deleting_non_existent_team(): void

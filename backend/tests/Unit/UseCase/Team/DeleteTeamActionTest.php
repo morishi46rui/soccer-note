@@ -21,6 +21,6 @@ class DeleteTeamActionTest extends TestCase
         $result = $action->execute($team);
 
         $this->assertTrue($result);
-        $this->assertDatabaseMissing('teams', ['id' => $team->id]);
+        $this->assertSoftDeleted('teams', ['id' => $team->id]);
     }
 }

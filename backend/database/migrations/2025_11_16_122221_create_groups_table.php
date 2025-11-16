@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name')->comment('グループ名');
             $table->text('description')->nullable()->comment('グループの説明');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index('team_id');
         });

@@ -8,6 +8,7 @@ use App\Traits\HasSqid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
@@ -19,11 +20,12 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'description', type: 'string', nullable: true, description: 'チームの説明'),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time', description: '作成日時'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', description: '更新日時'),
+        new OA\Property(property: 'deleted_at', type: 'string', format: 'date-time', nullable: true, description: '論理削除日時'),
     ]
 )]
 class Team extends Model
 {
-    use HasFactory, HasSqid;
+    use HasFactory, HasSqid, SoftDeletes;
 
     protected $fillable = [
         'name',

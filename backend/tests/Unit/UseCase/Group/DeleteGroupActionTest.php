@@ -21,7 +21,7 @@ class DeleteGroupActionTest extends TestCase
         $result = $action->execute($group);
 
         $this->assertTrue($result);
-        $this->assertDatabaseMissing('groups', [
+        $this->assertSoftDeleted('groups', [
             'id' => $group->id,
         ]);
     }

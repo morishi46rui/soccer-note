@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name')->comment('チーム名');
             $table->text('description')->nullable()->comment('チームの説明');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('display_name')->comment('表示名');
             $table->text('description')->nullable()->comment('ロールの説明');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

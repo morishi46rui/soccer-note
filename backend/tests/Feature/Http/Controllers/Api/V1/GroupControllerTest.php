@@ -256,7 +256,7 @@ class GroupControllerTest extends TestCase
 
         // Assert
         $response->assertNoContent();
-        $this->assertDatabaseMissing('groups', ['id' => $group->id]);
+        $this->assertSoftDeleted('groups', ['id' => $group->id]);
     }
 
     public function test_it_returns_404_when_deleting_non_existent_group(): void
