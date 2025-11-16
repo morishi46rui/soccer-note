@@ -139,23 +139,6 @@ class TeamControllerTest extends TestCase
             ->assertJsonValidationErrors(['name']);
     }
 
-    public function test_it_returns_a_single_team(): void
-    {
-        // Arrange
-        $team = Team::factory()->create();
-
-        // Act
-        $response = $this->actingAs($this->user)->getJson("/api/v1/teams/{$team->id}");
-
-        // Assert
-        $response->assertOk()
-            ->assertJsonFragment([
-                'id' => $team->id,
-                'name' => $team->name,
-                'description' => $team->description,
-            ]);
-    }
-
     public function test_it_returns_a_single_team_by_sqid(): void
     {
         // Arrange
@@ -176,37 +159,10 @@ class TeamControllerTest extends TestCase
     public function test_it_returns_404_when_team_not_found(): void
     {
         // Act
-        $response = $this->actingAs($this->user)->getJson('/api/v1/teams/99999');
+        $response = $this->actingAs($this->user)->getJson('/api/v1/teams/invalid-sqid');
 
         // Assert
         $response->assertNotFound();
-    }
-
-    public function test_it_updates_a_team(): void
-    {
-        // Arrange
-        $team = Team::factory()->create();
-        $updateData = [
-            'name' => '更新されたチーム名',
-            'description' => '更新された説明',
-        ];
-
-        // Act
-        $response = $this->actingAs($this->user)->putJson("/api/v1/teams/{$team->id}", $updateData);
-
-        // Assert
-        $response->assertOk()
-            ->assertJsonFragment([
-                'id' => $team->id,
-                'name' => '更新されたチーム名',
-                'description' => '更新された説明',
-            ]);
-
-        $this->assertDatabaseHas('teams', [
-            'id' => $team->id,
-            'name' => '更新されたチーム名',
-            'description' => '更新された説明',
-        ]);
     }
 
     public function test_it_updates_a_team_by_sqid(): void
@@ -245,7 +201,7 @@ class TeamControllerTest extends TestCase
         ];
 
         // Act
-        $response = $this->actingAs($this->user)->putJson("/api/v1/teams/{$team->id}", $updateData);
+        $response = $this->actingAs($this->user)->putJson("/api/v1/teams/{$team->sqid}", $updateData);
 
         // Assert
         $response->assertOk()
@@ -260,19 +216,6 @@ class TeamControllerTest extends TestCase
             'name' => '新しいチーム名',
             'description' => '元の説明',
         ]);
-    }
-
-    public function test_it_deletes_a_team(): void
-    {
-        // Arrange
-        $team = Team::factory()->create();
-
-        // Act
-        $response = $this->actingAs($this->user)->deleteJson("/api/v1/teams/{$team->id}");
-
-        // Assert
-        $response->assertNoContent();
-        $this->assertDatabaseMissing('teams', ['id' => $team->id]);
     }
 
     public function test_it_deletes_a_team_by_sqid(): void
@@ -291,7 +234,7 @@ class TeamControllerTest extends TestCase
     public function test_it_returns_404_when_deleting_non_existent_team(): void
     {
         // Act
-        $response = $this->actingAs($this->user)->deleteJson('/api/v1/teams/99999');
+        $response = $this->actingAs($this->user)->deleteJson('/api/v1/teams/invalid-sqid');
 
         // Assert
         $response->assertNotFound();

@@ -122,23 +122,6 @@ class NoteControllerTest extends TestCase
             ->assertJsonValidationErrors(['date']);
     }
 
-    public function test_it_returns_a_single_note(): void
-    {
-        // Arrange
-        $note = Note::factory()->create(['user_id' => $this->user->id]);
-
-        // Act
-        $response = $this->actingAs($this->user)->getJson("/api/v1/notes/{$note->id}");
-
-        // Assert
-        $response->assertOk()
-            ->assertJsonFragment([
-                'id' => $note->id,
-                'title' => $note->title,
-                'user_id' => $this->user->id,
-            ]);
-    }
-
     public function test_it_returns_a_single_note_by_sqid(): void
     {
         // Arrange
@@ -159,7 +142,7 @@ class NoteControllerTest extends TestCase
     public function test_it_returns_404_when_note_not_found(): void
     {
         // Act
-        $response = $this->actingAs($this->user)->getJson('/api/v1/notes/99999');
+        $response = $this->actingAs($this->user)->getJson('/api/v1/notes/invalid-sqid');
 
         // Assert
         $response->assertNotFound();
@@ -172,38 +155,10 @@ class NoteControllerTest extends TestCase
         $note = Note::factory()->create(['user_id' => $otherUser->id]);
 
         // Act
-        $response = $this->actingAs($this->user)->getJson("/api/v1/notes/{$note->id}");
+        $response = $this->actingAs($this->user)->getJson("/api/v1/notes/{$note->sqid}");
 
         // Assert
         $response->assertNotFound();
-    }
-
-    public function test_it_updates_a_note(): void
-    {
-        // Arrange
-        $note = Note::factory()->create(['user_id' => $this->user->id]);
-        $updateData = [
-            'title' => '更新されたタイトル',
-            'date' => '2025-11-14',
-            'content' => '更新された内容',
-        ];
-
-        // Act
-        $response = $this->actingAs($this->user)->putJson("/api/v1/notes/{$note->id}", $updateData);
-
-        // Assert
-        $response->assertOk()
-            ->assertJsonFragment([
-                'id' => $note->id,
-                'title' => '更新されたタイトル',
-                'date' => '2025-11-14',
-                'content' => '更新された内容',
-            ]);
-
-        $this->assertDatabaseHas('notes', [
-            'id' => $note->id,
-            'title' => '更新されたタイトル',
-        ]);
     }
 
     public function test_it_updates_a_note_by_sqid(): void
@@ -240,7 +195,7 @@ class NoteControllerTest extends TestCase
         $note = Note::factory()->create(['user_id' => $this->user->id]);
 
         // Act
-        $response = $this->actingAs($this->user)->putJson("/api/v1/notes/{$note->id}", []);
+        $response = $this->actingAs($this->user)->putJson("/api/v1/notes/{$note->sqid}", []);
 
         // Assert
         $response->assertUnprocessable()
@@ -259,24 +214,11 @@ class NoteControllerTest extends TestCase
         ];
 
         // Act
-        $response = $this->actingAs($this->user)->putJson("/api/v1/notes/{$note->id}", $updateData);
+        $response = $this->actingAs($this->user)->putJson("/api/v1/notes/{$note->sqid}", $updateData);
 
         // Assert
         $response->assertNotFound();
         $this->assertDatabaseMissing('notes', ['title' => '不正な更新']);
-    }
-
-    public function test_it_deletes_a_note(): void
-    {
-        // Arrange
-        $note = Note::factory()->create(['user_id' => $this->user->id]);
-
-        // Act
-        $response = $this->actingAs($this->user)->deleteJson("/api/v1/notes/{$note->id}");
-
-        // Assert
-        $response->assertNoContent();
-        $this->assertSoftDeleted('notes', ['id' => $note->id]);
     }
 
     public function test_it_deletes_a_note_by_sqid(): void
@@ -299,7 +241,7 @@ class NoteControllerTest extends TestCase
         $note = Note::factory()->create(['user_id' => $otherUser->id]);
 
         // Act
-        $response = $this->actingAs($this->user)->deleteJson("/api/v1/notes/{$note->id}");
+        $response = $this->actingAs($this->user)->deleteJson("/api/v1/notes/{$note->sqid}");
 
         // Assert
         $response->assertNotFound();

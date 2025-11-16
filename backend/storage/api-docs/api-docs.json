@@ -348,19 +348,19 @@
                 ]
             }
         },
-        "/api/v1/notes/{id}": {
+        "/api/v1/notes/{sqid}": {
             "get": {
                 "tags": [
                     "Notes"
                 ],
                 "summary": "ノート詳細取得",
-                "description": "指定されたSqidまたはIDのノート詳細を取得します",
+                "description": "指定されたSqidのノート詳細を取得します",
                 "operationId": "getNote",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "sqid",
                         "in": "path",
-                        "description": "ノートSqidまたはID",
+                        "description": "ノートSqid",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -396,13 +396,13 @@
                     "Notes"
                 ],
                 "summary": "ノート更新",
-                "description": "指定されたSqidまたはIDのノートを更新します",
+                "description": "指定されたSqidのノートを更新します",
                 "operationId": "updateNote",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "sqid",
                         "in": "path",
-                        "description": "ノートSqidまたはID",
+                        "description": "ノートSqid",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -451,13 +451,13 @@
                     "Notes"
                 ],
                 "summary": "ノート削除",
-                "description": "指定されたSqidまたはIDのノートを削除します",
+                "description": "指定されたSqidのノートを削除します",
                 "operationId": "deleteNote",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "sqid",
                         "in": "path",
-                        "description": "ノートSqidまたはID",
+                        "description": "ノートSqid",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -726,19 +726,19 @@
                 ]
             }
         },
-        "/api/v1/teams/{id}": {
+        "/api/v1/teams/{sqid}": {
             "get": {
                 "tags": [
                     "Teams"
                 ],
                 "summary": "チーム詳細取得",
-                "description": "指定されたSqidまたはIDのチーム詳細を取得します",
+                "description": "指定されたSqidのチーム詳細を取得します",
                 "operationId": "getTeam",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "sqid",
                         "in": "path",
-                        "description": "チームSqidまたはID",
+                        "description": "チームSqid",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -774,13 +774,13 @@
                     "Teams"
                 ],
                 "summary": "チーム更新",
-                "description": "指定されたSqidまたはIDのチームを更新します",
+                "description": "指定されたSqidのチームを更新します",
                 "operationId": "updateTeam",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "sqid",
                         "in": "path",
-                        "description": "チームSqidまたはID",
+                        "description": "チームSqid",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -829,13 +829,13 @@
                     "Teams"
                 ],
                 "summary": "チーム削除",
-                "description": "指定されたSqidまたはIDのチームを削除します",
+                "description": "指定されたSqidのチームを削除します",
                 "operationId": "deleteTeam",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "sqid",
                         "in": "path",
-                        "description": "チームSqidまたはID",
+                        "description": "チームSqid",
                         "required": true,
                         "schema": {
                             "type": "string"

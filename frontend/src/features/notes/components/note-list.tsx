@@ -54,7 +54,7 @@ export function NoteList() {
     <Stack spacing={3}>
       <Stack spacing={2}>
         {notes.map((note) => (
-          <Card key={note.id} elevation={1}>
+          <Card key={note.sqid} elevation={1}>
             <CardActionArea component={Link} href={`/notes/${note.sqid}`}>
               <CardContent>
                 <Stack spacing={1}>

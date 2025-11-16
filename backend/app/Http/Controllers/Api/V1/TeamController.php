@@ -72,18 +72,18 @@ class TeamController extends Controller
     }
 
     #[OA\Get(
-        path: '/api/v1/teams/{id}',
+        path: '/api/v1/teams/{sqid}',
         tags: ['Teams'],
         summary: 'チーム詳細取得',
-        description: '指定されたSqidまたはIDのチーム詳細を取得します',
+        description: '指定されたSqidのチーム詳細を取得します',
         operationId: 'getTeam',
         security: [['sanctum' => []]]
     )]
     #[OA\Parameter(
-        name: 'id',
+        name: 'sqid',
         in: 'path',
         required: true,
-        description: 'チームSqidまたはID',
+        description: 'チームSqid',
         schema: new OA\Schema(type: 'string')
     )]
     #[OA\Response(
@@ -93,10 +93,9 @@ class TeamController extends Controller
     )]
     #[OA\Response(response: '401', ref: '#/components/responses/401')]
     #[OA\Response(response: '404', ref: '#/components/responses/404')]
-    public function show(string $id, GetTeamAction $action): JsonResponse
+    public function show(string $sqid, GetTeamAction $action): JsonResponse
     {
-        // SqidまたはIDを受け入れる
-        $teamId = is_numeric($id) ? (int) $id : Team::findBySqid($id)?->id;
+        $teamId = Team::findBySqid($sqid)?->id;
 
         if ($teamId === null) {
             return response()->json([
@@ -116,18 +115,18 @@ class TeamController extends Controller
     }
 
     #[OA\Put(
-        path: '/api/v1/teams/{id}',
+        path: '/api/v1/teams/{sqid}',
         tags: ['Teams'],
         summary: 'チーム更新',
-        description: '指定されたSqidまたはIDのチームを更新します',
+        description: '指定されたSqidのチームを更新します',
         operationId: 'updateTeam',
         security: [['sanctum' => []]]
     )]
     #[OA\Parameter(
-        name: 'id',
+        name: 'sqid',
         in: 'path',
         required: true,
-        description: 'チームSqidまたはID',
+        description: 'チームSqid',
         schema: new OA\Schema(type: 'string')
     )]
     #[OA\RequestBody(
@@ -142,10 +141,9 @@ class TeamController extends Controller
     #[OA\Response(response: '401', ref: '#/components/responses/401')]
     #[OA\Response(response: '404', ref: '#/components/responses/404')]
     #[OA\Response(response: '422', ref: '#/components/responses/422')]
-    public function update(string $id, UpdateTeamRequest $request, UpdateTeamAction $action, GetTeamAction $getTeamAction): JsonResponse
+    public function update(string $sqid, UpdateTeamRequest $request, UpdateTeamAction $action, GetTeamAction $getTeamAction): JsonResponse
     {
-        // SqidまたはIDを受け入れる
-        $teamId = is_numeric($id) ? (int) $id : Team::findBySqid($id)?->id;
+        $teamId = Team::findBySqid($sqid)?->id;
 
         if ($teamId === null) {
             return response()->json([
@@ -167,18 +165,18 @@ class TeamController extends Controller
     }
 
     #[OA\Delete(
-        path: '/api/v1/teams/{id}',
+        path: '/api/v1/teams/{sqid}',
         tags: ['Teams'],
         summary: 'チーム削除',
-        description: '指定されたSqidまたはIDのチームを削除します',
+        description: '指定されたSqidのチームを削除します',
         operationId: 'deleteTeam',
         security: [['sanctum' => []]]
     )]
     #[OA\Parameter(
-        name: 'id',
+        name: 'sqid',
         in: 'path',
         required: true,
-        description: 'チームSqidまたはID',
+        description: 'チームSqid',
         schema: new OA\Schema(type: 'string')
     )]
     #[OA\Response(
@@ -187,10 +185,9 @@ class TeamController extends Controller
     )]
     #[OA\Response(response: '401', ref: '#/components/responses/401')]
     #[OA\Response(response: '404', ref: '#/components/responses/404')]
-    public function destroy(string $id, DeleteTeamAction $action, GetTeamAction $getTeamAction): JsonResponse
+    public function destroy(string $sqid, DeleteTeamAction $action, GetTeamAction $getTeamAction): JsonResponse
     {
-        // SqidまたはIDを受け入れる
-        $teamId = is_numeric($id) ? (int) $id : Team::findBySqid($id)?->id;
+        $teamId = Team::findBySqid($sqid)?->id;
 
         if ($teamId === null) {
             return response()->json([

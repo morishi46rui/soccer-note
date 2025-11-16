@@ -72,18 +72,18 @@ class NoteController extends Controller
     }
 
     #[OA\Get(
-        path: '/api/v1/notes/{id}',
+        path: '/api/v1/notes/{sqid}',
         tags: ['Notes'],
         summary: 'ノート詳細取得',
-        description: '指定されたSqidまたはIDのノート詳細を取得します',
+        description: '指定されたSqidのノート詳細を取得します',
         operationId: 'getNote',
         security: [['sanctum' => []]]
     )]
     #[OA\Parameter(
-        name: 'id',
+        name: 'sqid',
         in: 'path',
         required: true,
-        description: 'ノートSqidまたはID',
+        description: 'ノートSqid',
         schema: new OA\Schema(type: 'string')
     )]
     #[OA\Response(
@@ -93,10 +93,9 @@ class NoteController extends Controller
     )]
     #[OA\Response(response: '401', ref: '#/components/responses/401')]
     #[OA\Response(response: '404', ref: '#/components/responses/404')]
-    public function show(string $id, Request $request, GetNoteAction $action): JsonResponse
+    public function show(string $sqid, Request $request, GetNoteAction $action): JsonResponse
     {
-        // SqidまたはIDを受け入れる
-        $noteId = is_numeric($id) ? (int) $id : Note::findBySqid($id)?->id;
+        $noteId = Note::findBySqid($sqid)?->id;
 
         if ($noteId === null) {
             return response()->json([
@@ -116,18 +115,18 @@ class NoteController extends Controller
     }
 
     #[OA\Put(
-        path: '/api/v1/notes/{id}',
+        path: '/api/v1/notes/{sqid}',
         tags: ['Notes'],
         summary: 'ノート更新',
-        description: '指定されたSqidまたはIDのノートを更新します',
+        description: '指定されたSqidのノートを更新します',
         operationId: 'updateNote',
         security: [['sanctum' => []]]
     )]
     #[OA\Parameter(
-        name: 'id',
+        name: 'sqid',
         in: 'path',
         required: true,
-        description: 'ノートSqidまたはID',
+        description: 'ノートSqid',
         schema: new OA\Schema(type: 'string')
     )]
     #[OA\RequestBody(
@@ -142,10 +141,9 @@ class NoteController extends Controller
     #[OA\Response(response: '401', ref: '#/components/responses/401')]
     #[OA\Response(response: '404', ref: '#/components/responses/404')]
     #[OA\Response(response: '422', ref: '#/components/responses/422')]
-    public function update(string $id, UpdateNoteRequest $request, UpdateNoteAction $action, GetNoteAction $getNoteAction): JsonResponse
+    public function update(string $sqid, UpdateNoteRequest $request, UpdateNoteAction $action, GetNoteAction $getNoteAction): JsonResponse
     {
-        // SqidまたはIDを受け入れる
-        $noteId = is_numeric($id) ? (int) $id : Note::findBySqid($id)?->id;
+        $noteId = Note::findBySqid($sqid)?->id;
 
         if ($noteId === null) {
             return response()->json([
@@ -167,18 +165,18 @@ class NoteController extends Controller
     }
 
     #[OA\Delete(
-        path: '/api/v1/notes/{id}',
+        path: '/api/v1/notes/{sqid}',
         tags: ['Notes'],
         summary: 'ノート削除',
-        description: '指定されたSqidまたはIDのノートを削除します',
+        description: '指定されたSqidのノートを削除します',
         operationId: 'deleteNote',
         security: [['sanctum' => []]]
     )]
     #[OA\Parameter(
-        name: 'id',
+        name: 'sqid',
         in: 'path',
         required: true,
-        description: 'ノートSqidまたはID',
+        description: 'ノートSqid',
         schema: new OA\Schema(type: 'string')
     )]
     #[OA\Response(
@@ -187,10 +185,9 @@ class NoteController extends Controller
     )]
     #[OA\Response(response: '401', ref: '#/components/responses/401')]
     #[OA\Response(response: '404', ref: '#/components/responses/404')]
-    public function destroy(string $id, Request $request, DeleteNoteAction $action, GetNoteAction $getNoteAction): JsonResponse
+    public function destroy(string $sqid, Request $request, DeleteNoteAction $action, GetNoteAction $getNoteAction): JsonResponse
     {
-        // SqidまたはIDを受け入れる
-        $noteId = is_numeric($id) ? (int) $id : Note::findBySqid($id)?->id;
+        $noteId = Note::findBySqid($sqid)?->id;
 
         if ($noteId === null) {
             return response()->json([

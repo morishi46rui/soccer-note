@@ -168,7 +168,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/notes/{id}": {
+    "/api/v1/notes/{sqid}": {
         parameters: {
             query?: never;
             header?: never;
@@ -177,18 +177,18 @@ export interface paths {
         };
         /**
          * ノート詳細取得
-         * @description 指定されたSqidまたはIDのノート詳細を取得します
+         * @description 指定されたSqidのノート詳細を取得します
          */
         get: operations["getNote"];
         /**
          * ノート更新
-         * @description 指定されたSqidまたはIDのノートを更新します
+         * @description 指定されたSqidのノートを更新します
          */
         put: operations["updateNote"];
         post?: never;
         /**
          * ノート削除
-         * @description 指定されたSqidまたはIDのノートを削除します
+         * @description 指定されたSqidのノートを削除します
          */
         delete: operations["deleteNote"];
         options?: never;
@@ -260,7 +260,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/teams/{id}": {
+    "/api/v1/teams/{sqid}": {
         parameters: {
             query?: never;
             header?: never;
@@ -269,18 +269,18 @@ export interface paths {
         };
         /**
          * チーム詳細取得
-         * @description 指定されたSqidまたはIDのチーム詳細を取得します
+         * @description 指定されたSqidのチーム詳細を取得します
          */
         get: operations["getTeam"];
         /**
          * チーム更新
-         * @description 指定されたSqidまたはIDのチームを更新します
+         * @description 指定されたSqidのチームを更新します
          */
         put: operations["updateTeam"];
         post?: never;
         /**
          * チーム削除
-         * @description 指定されたSqidまたはIDのチームを削除します
+         * @description 指定されたSqidのチームを削除します
          */
         delete: operations["deleteTeam"];
         options?: never;
@@ -944,8 +944,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description ノートSqidまたはID */
-                id: string;
+                /** @description ノートSqid */
+                sqid: string;
             };
             cookie?: never;
         };
@@ -969,8 +969,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description ノートSqidまたはID */
-                id: string;
+                /** @description ノートSqid */
+                sqid: string;
             };
             cookie?: never;
         };
@@ -999,8 +999,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description ノートSqidまたはID */
-                id: string;
+                /** @description ノートSqid */
+                sqid: string;
             };
             cookie?: never;
         };
@@ -1204,8 +1204,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description チームSqidまたはID */
-                id: string;
+                /** @description チームSqid */
+                sqid: string;
             };
             cookie?: never;
         };
@@ -1229,8 +1229,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description チームSqidまたはID */
-                id: string;
+                /** @description チームSqid */
+                sqid: string;
             };
             cookie?: never;
         };
@@ -1259,8 +1259,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description チームSqidまたはID */
-                id: string;
+                /** @description チームSqid */
+                sqid: string;
             };
             cookie?: never;
         };
