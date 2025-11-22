@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/api/v1/admin/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * システム統計情報の取得
+         * @description システム全体の統計情報を取得します
+         */
+        get: operations["getAdminStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/register": {
         parameters: {
             query?: never;
@@ -447,6 +467,11 @@ export interface components {
              * @description 更新日時
              */
             updated_at?: string;
+            /**
+             * Format: date-time
+             * @description 論理削除日時
+             */
+            deleted_at?: string | null;
         };
         Note: {
             /**
@@ -489,6 +514,62 @@ export interface components {
              */
             deleted_at?: string | null;
         };
+        Permission: {
+            /**
+             * Format: int64
+             * @description 権限ID
+             */
+            id?: number;
+            /** @description 権限識別子 */
+            name?: string;
+            /** @description 表示名 */
+            display_name?: string;
+            /** @description 権限の説明 */
+            description?: string | null;
+            /**
+             * Format: date-time
+             * @description 作成日時
+             */
+            created_at?: string;
+            /**
+             * Format: date-time
+             * @description 更新日時
+             */
+            updated_at?: string;
+            /**
+             * Format: date-time
+             * @description 論理削除日時
+             */
+            deleted_at?: string | null;
+        };
+        Role: {
+            /**
+             * Format: int64
+             * @description ロールID
+             */
+            id?: number;
+            /** @description ロール識別子 */
+            name?: string;
+            /** @description 表示名 */
+            display_name?: string;
+            /** @description ロールの説明 */
+            description?: string | null;
+            /**
+             * Format: date-time
+             * @description 作成日時
+             */
+            created_at?: string;
+            /**
+             * Format: date-time
+             * @description 更新日時
+             */
+            updated_at?: string;
+            /**
+             * Format: date-time
+             * @description 論理削除日時
+             */
+            deleted_at?: string | null;
+        };
         Team: {
             /**
              * Format: int64
@@ -514,6 +595,11 @@ export interface components {
              * @description 更新日時
              */
             updated_at?: string;
+            /**
+             * Format: date-time
+             * @description 論理削除日時
+             */
+            deleted_at?: string | null;
         };
         User: {
             /**
@@ -560,6 +646,18 @@ export interface components {
              * @description 論理削除日時
              */
             deleted_at?: string | null;
+        };
+        AdminStatsResponse: {
+            /** @description 総ユーザー数 */
+            total_users?: number;
+            /** @description アクティブユーザー数 */
+            active_users?: number;
+            /** @description 総チーム数 */
+            total_teams?: number;
+            /** @description 総グループ数 */
+            total_groups?: number;
+            /** @description 総投稿数 */
+            total_posts?: number;
         };
         GetProfileResponse: {
             id?: components["schemas"]["User"]["id"];
@@ -803,6 +901,27 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getAdminStats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 統計情報の取得成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminStatsResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+        };
+    };
     register: {
         parameters: {
             query?: never;

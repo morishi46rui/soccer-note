@@ -15,6 +15,36 @@
         }
     ],
     "paths": {
+        "/api/v1/admin/stats": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "システム統計情報の取得",
+                "description": "システム全体の統計情報を取得します",
+                "operationId": "getAdminStats",
+                "responses": {
+                    "200": {
+                        "description": "統計情報の取得成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdminStatsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/auth/register": {
             "post": {
                 "tags": [
@@ -1290,6 +1320,12 @@
                         "description": "更新日時",
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "deleted_at": {
+                        "description": "論理削除日時",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -1343,6 +1379,84 @@
                 },
                 "type": "object"
             },
+            "Permission": {
+                "properties": {
+                    "id": {
+                        "description": "権限ID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "description": "権限識別子",
+                        "type": "string"
+                    },
+                    "display_name": {
+                        "description": "表示名",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "権限の説明",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "作成日時",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "更新日時",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "deleted_at": {
+                        "description": "論理削除日時",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Role": {
+                "properties": {
+                    "id": {
+                        "description": "ロールID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "description": "ロール識別子",
+                        "type": "string"
+                    },
+                    "display_name": {
+                        "description": "表示名",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "ロールの説明",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "作成日時",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "更新日時",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "deleted_at": {
+                        "description": "論理削除日時",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "Team": {
                 "properties": {
                     "id": {
@@ -1373,6 +1487,12 @@
                         "description": "更新日時",
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "deleted_at": {
+                        "description": "論理削除日時",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -1429,6 +1549,31 @@
                         "type": "string",
                         "format": "date-time",
                         "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "AdminStatsResponse": {
+                "properties": {
+                    "total_users": {
+                        "description": "総ユーザー数",
+                        "type": "integer"
+                    },
+                    "active_users": {
+                        "description": "アクティブユーザー数",
+                        "type": "integer"
+                    },
+                    "total_teams": {
+                        "description": "総チーム数",
+                        "type": "integer"
+                    },
+                    "total_groups": {
+                        "description": "総グループ数",
+                        "type": "integer"
+                    },
+                    "total_posts": {
+                        "description": "総投稿数",
+                        "type": "integer"
                     }
                 },
                 "type": "object"
@@ -2021,6 +2166,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Admin",
+            "description": "管理者機能"
+        },
         {
             "name": "Auth",
             "description": "認証"

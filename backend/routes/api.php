@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AdminController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\GroupController;
 use App\Http\Controllers\Api\V1\HealthController;
@@ -16,6 +17,7 @@ Route::prefix('v1')->group(function () {
 
     // Sanctum認証が必要なエンドポイント
     Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/admin/stats', [AdminController::class, 'getStats']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
