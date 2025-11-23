@@ -1,8 +1,13 @@
 "use client";
 
 import { Box } from "@mui/material";
+import dynamic from "next/dynamic";
 import type { PropsWithChildren } from "react";
-import { Sidebar } from "./sidebar";
+
+// SSRを無効にしてハイドレーション不一致を防ぐ
+const Sidebar = dynamic(() => import("./sidebar").then((mod) => mod.Sidebar), {
+  ssr: false,
+});
 
 export const DashboardLayout = ({ children }: PropsWithChildren) => {
   return (

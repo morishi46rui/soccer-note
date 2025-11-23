@@ -5,6 +5,7 @@ import type { NavItem } from "@/types/navigation";
 import {
   AdminPanelSettings as AdminIcon,
   Dashboard as DashboardIcon,
+  Groups as GroupsIcon,
   Logout as LogoutIcon,
   Notes as NotesIcon,
 } from "@mui/icons-material";
@@ -21,9 +22,23 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import Link from "next/link";
+import type { LinkProps as NextLinkProps } from "next/link";
+import NextLink from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import type { AnchorHTMLAttributes } from "react";
+import { forwardRef, useMemo, useState } from "react";
+
+// MUIとNext.js Linkの互換性のためのラッパーコンポーネント
+// MUI v6 + Next.js App Router用
+type LinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> &
+  Omit<NextLinkProps, "as"> & {
+    href: NextLinkProps["href"];
+  };
+
+const Link = forwardRef<HTMLAnchorElement, LinkProps>(
+  ({ href, ...props }, ref) => <NextLink ref={ref} href={href} {...props} />
+);
+Link.displayName = "Link";
 
 const SIDEBAR_WIDTH = 240;
 
@@ -37,6 +52,11 @@ const baseNavItems: NavItem[] = [
     label: "ノート",
     path: "/notes",
     icon: <NotesIcon />,
+  },
+  {
+    label: "チーム",
+    path: "/teams",
+    icon: <GroupsIcon />,
   },
 ];
 
@@ -135,20 +155,21 @@ export const Sidebar = () => {
 
               {/* Footer */}
               <List>
-                {isAdmin && (
-                  <ListItem disablePadding>
-                    <ListItemButton
-                      component={Link}
-                      href="/admin"
-                      sx={{ mx: 1, borderRadius: 1 }}
-                    >
-                      <ListItemIcon sx={{ minWidth: 40 }}>
-                        <AdminIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="管理画面" />
-                    </ListItemButton>
-                  </ListItem>
-                )}
+                <ListItem
+                  disablePadding
+                  sx={{ display: isAdmin ? "block" : "none" }}
+                >
+                  <ListItemButton
+                    component={Link}
+                    href="/admin"
+                    sx={{ mx: 1, borderRadius: 1 }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      <AdminIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="管理画面" />
+                  </ListItemButton>
+                </ListItem>
                 <ListItem disablePadding>
                   <ListItemButton
                     onClick={handleLogout}
