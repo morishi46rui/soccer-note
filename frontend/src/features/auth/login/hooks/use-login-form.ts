@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/hooks/use-auth";
 import { ApiError } from "@/lib/api-client";
 import { useRouter } from "next/navigation";
 import type { ChangeEvent, FormEvent } from "react";
@@ -61,6 +62,7 @@ export const useLoginForm = () => {
   const [status, setStatus] = useState<LoginFormStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const router = useRouter();
+  const { setUser } = useAuth();
 
   const loginMutation = useLoginMutation();
 
@@ -123,8 +125,45 @@ export const useLoginForm = () => {
           device_name: "Web Browser",
         },
         {
-          onSuccess: () => {
+          onSuccess: (data) => {
             setStatus("success");
+            // AuthProviderに状態を反映
+            if (
+              data.token &&
+              data.user &&
+              data.user.id &&
+              data.user.name &&
+              data.user.email
+            ) {
+              const roles = data.user.roles
+                ?.filter(
+                  (
+                    role
+                  ): role is {
+                    id: number;
+                    name: string;
+                    display_name: string;
+                  } =>
+                    role.id !== undefined &&
+                    role.name !== undefined &&
+                    role.display_name !== undefined
+                )
+                .map((role) => ({
+                  id: role.id,
+                  name: role.name,
+                  display_name: role.display_name,
+                }));
+
+              setUser(
+                {
+                  id: data.user.id,
+                  name: data.user.name,
+                  email: data.user.email,
+                  roles,
+                },
+                data.token
+              );
+            }
             setTimeout(() => {
               router.push("/dashboard");
             }, 1000);
@@ -150,7 +189,7 @@ export const useLoginForm = () => {
         }
       );
     },
-    [values, loginMutation, router]
+    [values, loginMutation, router, setUser]
   );
 
   const isSubmitting = status === "submitting" || loginMutation.isPending;

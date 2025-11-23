@@ -1592,6 +1592,23 @@
                     "email_verified_at": {
                         "$ref": "#/components/schemas/User/properties/email_verified_at"
                     },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "display_name": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
                     "created_at": {
                         "$ref": "#/components/schemas/User/properties/created_at"
                     },
@@ -1617,6 +1634,23 @@
                             },
                             "email": {
                                 "$ref": "#/components/schemas/User/properties/email"
+                            },
+                            "roles": {
+                                "type": "array",
+                                "items": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "display_name": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         },
                         "type": "object"

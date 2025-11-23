@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\HasSqid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -52,5 +53,13 @@ class User extends Authenticatable
             'password' => 'hashed',
             'deleted_at' => 'datetime',
         ];
+    }
+
+    /**
+     * ユーザーが持つロール
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'user_roles');
     }
 }

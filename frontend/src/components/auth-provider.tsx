@@ -42,6 +42,13 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     }
   }, [token]);
 
+  const setUser = (user: User, token: string) => {
+    localStorage.setItem("auth_token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    apiClient.setAuthToken(token);
+    setAuthState({ user, token });
+  };
+
   const logout = () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("user");
@@ -54,6 +61,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     token,
     isAuthenticated: !!token,
     isLoading: false,
+    setUser,
     logout,
   };
 

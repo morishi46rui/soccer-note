@@ -1,9 +1,10 @@
 "use client";
 
-import { useAuth } from "@/hooks/use-auth";
 import type { AdminNavItem } from "@/features/admin/types/navigation";
+import { useAuth } from "@/hooks/use-auth";
 import {
   Dashboard as DashboardIcon,
+  Home as HomeIcon,
   Logout as LogoutIcon,
   People as PeopleIcon,
   Security as SecurityIcon,
@@ -78,7 +79,7 @@ export const AdminSidebar = () => {
           borderRight: collapsed ? "none" : "1px solid",
           borderColor: "divider",
           overflowX: "hidden",
-          backgroundColor: "grey.900",
+          backgroundColor: collapsed ? "grey.50" : "grey.900",
           color: "white",
         },
       }}
@@ -87,7 +88,10 @@ export const AdminSidebar = () => {
         <Stack sx={{ height: "100%" }}>
           {/* 開閉ボタン */}
           <Box sx={{ p: 2 }}>
-            <IconButton onClick={handleToggleCollapse} sx={{ color: "white" }}>
+            <IconButton
+              onClick={handleToggleCollapse}
+              sx={{ color: "primary.main" }}
+            >
               <SettingsIcon />
             </IconButton>
           </Box>
@@ -144,6 +148,25 @@ export const AdminSidebar = () => {
 
               {/* Footer */}
               <List>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href="/dashboard"
+                    sx={{
+                      mx: 1,
+                      borderRadius: 1,
+                      color: "grey.300",
+                      "&:hover": {
+                        backgroundColor: "grey.800",
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40, color: "inherit" }}>
+                      <HomeIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="ユーザー画面へ" />
+                  </ListItemButton>
+                </ListItem>
                 <ListItem disablePadding>
                   <ListItemButton
                     onClick={handleLogout}

@@ -664,6 +664,11 @@ export interface components {
             name?: components["schemas"]["User"]["name"];
             email?: components["schemas"]["User"]["email"];
             email_verified_at?: components["schemas"]["User"]["email_verified_at"];
+            roles?: {
+                id?: number;
+                name?: string;
+                display_name?: string;
+            }[];
             created_at?: components["schemas"]["User"]["created_at"];
             updated_at?: components["schemas"]["User"]["updated_at"];
         };
@@ -674,6 +679,11 @@ export interface components {
                 id?: components["schemas"]["User"]["id"];
                 name?: components["schemas"]["User"]["name"];
                 email?: components["schemas"]["User"]["email"];
+                roles?: {
+                    id?: number;
+                    name?: string;
+                    display_name?: string;
+                }[];
             };
         };
         LogoutResponse: {

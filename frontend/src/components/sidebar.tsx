@@ -3,6 +3,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import type { NavItem } from "@/types/navigation";
 import {
+  AdminPanelSettings as AdminIcon,
   Dashboard as DashboardIcon,
   Logout as LogoutIcon,
   Notes as NotesIcon,
@@ -22,11 +23,11 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const SIDEBAR_WIDTH = 240;
 
-const navItems: NavItem[] = [
+const baseNavItems: NavItem[] = [
   {
     label: "ダッシュボード",
     path: "/dashboard",
@@ -41,11 +42,21 @@ const navItems: NavItem[] = [
 
 export const Sidebar = () => {
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
 
   // デスクトップ用の折りたたみ状態(初期値は閉じた状態)
   const [collapsed, setCollapsed] = useState(false);
+
+  // ユーザーがadminロールを持っているかチェック
+  const isAdmin = useMemo(() => {
+    return user?.roles?.some((role) => role.name === "admin") ?? false;
+  }, [user]);
+
+  // adminユーザーの場合は管理画面へのリンクを追加
+  const navItems = useMemo(() => {
+    return baseNavItems;
+  }, []);
 
   const handleToggleCollapse = () => {
     setCollapsed(!collapsed);
@@ -124,6 +135,20 @@ export const Sidebar = () => {
 
               {/* Footer */}
               <List>
+                {isAdmin && (
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      component={Link}
+                      href="/admin"
+                      sx={{ mx: 1, borderRadius: 1 }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 40 }}>
+                        <AdminIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="管理画面" />
+                    </ListItemButton>
+                  </ListItem>
+                )}
                 <ListItem disablePadding>
                   <ListItemButton
                     onClick={handleLogout}

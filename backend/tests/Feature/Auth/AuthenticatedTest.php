@@ -19,6 +19,12 @@ class AuthenticatedTest extends TestCase
         $response = $this->getJson('/api/v1/auth/me');
 
         $response->assertStatus(200)
+            ->assertJsonStructure([
+                'id',
+                'name',
+                'email',
+                'roles',
+            ])
             ->assertJson([
                 'id' => $user->id,
                 'name' => $user->name,

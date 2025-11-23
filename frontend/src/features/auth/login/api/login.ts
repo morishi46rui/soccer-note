@@ -12,16 +12,6 @@ export async function loginApi(data: LoginRequest): Promise<LoginResponse> {
 export function useLoginMutation() {
   return useMutation<LoginResponse, Error, LoginRequest>({
     mutationFn: loginApi,
-    onSuccess: (data) => {
-      // トークンを保存
-      if (data.token) {
-        localStorage.setItem("auth_token", data.token);
-      }
-      // ユーザー情報を保存（オプション）
-      if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-      }
-    },
     onError: (error) => {
       console.error("Login error:", error);
       if (error instanceof ApiError) {
