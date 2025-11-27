@@ -3,7 +3,15 @@
 ## 概要
 
 Soccer Note アプリケーションのデータベース設計ドキュメント。
-チーム > グループ > ユーザーの階層構造を基本とし、柔軟な権限管理を実現する。
+チーム > グループ > ユーザーの階層構造を基本とし、ユーザーに直接権限を付与する方式で柔軟な権限管理を実現する。
+
+## 設計方針
+
+### 権限管理の基本方針
+
+-   **ユーザーに直接権限を付与**: ロールを介さず、ユーザーと権限を直接紐付ける
+-   **チームオーナー制**: チームごとにオーナーを設定し、team_user テーブルの is_owner フラグで管理
+-   **シンプルな構造**: roles、role_permissions、user_roles テーブルは不要
 
 ## エンティティ構造
 
@@ -79,30 +87,6 @@ Soccer Note アプリケーションのデータベース設計ドキュメン�
 
 ### 権限管理
 
-#### roles (ロール定義)
-
-| カラム名     | 型           | NULL | デフォルト     | 説明                                                     |
-| ------------ | ------------ | ---- | -------------- | -------------------------------------------------------- |
-| id           | bigint       | NO   | AUTO_INCREMENT | 主キー                                                   |
-| name         | varchar(50)  | NO   | -              | ロール識別子 (例: 'player', 'coach', 'manager', 'admin') |
-| display_name | varchar(255) | NO   | -              | 表示名 (例: '選手', 'コーチ', 'マネージャー', '管理者')  |
-| description  | text         | YES  | NULL           | ロールの説明                                             |
-| created_at   | timestamp    | YES  | NULL           | 作成日時                                                 |
-| updated_at   | timestamp    | YES  | NULL           | 更新日時                                                 |
-
-**インデックス**
-
--   PRIMARY KEY: `id`
--   UNIQUE: `name`
-
-**初期データ例**
-
--   admin: 管理者
--   player: 選手
--   coach: コーチ
-
----
-
 #### permissions (権限定義)
 
 | カラム名     | 型           | NULL | デフォルト     | 説明                                        |
@@ -122,6 +106,7 @@ Soccer Note アプリケーションのデータベース設計ドキュメン�
 **初期データ例**
 
 -   view_notes: ノート閲覧
+-   create_notes: ノート作成
 -   edit_notes: ノート編集
 -   delete_notes: ノート削除
 -   manage_team: チーム管理
@@ -130,19 +115,25 @@ Soccer Note アプリケーションのデータベース設計ドキュメン�
 
 ---
 
-#### role_permissions (ロールと権限の紐付け)
+#### user_permissions (ユーザーと権限の紐付け)
 
-| カラム名      | 型     | NULL | デフォルト | 説明                 |
-| ------------- | ------ | ---- | ---------- | -------------------- |
-| role_id       | bigint | NO   | -          | ロール ID (外部キー) |
-| permission_id | bigint | NO   | -          | 権限 ID (外部キー)   |
+ユーザーに直接権限を付与するテーブル。
+
+| カラム名      | 型        | NULL | デフォルト     | 説明                   |
+| ------------- | --------- | ---- | -------------- | ---------------------- |
+| id            | bigint    | NO   | AUTO_INCREMENT | 主キー                 |
+| user_id       | bigint    | NO   | -              | ユーザー ID (外部キー) |
+| permission_id | bigint    | NO   | -              | 権限 ID (外部キー)     |
+| created_at    | timestamp | YES  | NULL           | 作成日時               |
+| updated_at    | timestamp | YES  | NULL           | 更新日時               |
 
 **インデックス**
 
--   PRIMARY KEY: `(role_id, permission_id)`
--   FOREIGN KEY: `role_id` REFERENCES `roles(id)` ON DELETE CASCADE
+-   PRIMARY KEY: `id`
+-   UNIQUE: `(user_id, permission_id)` (同じユーザーに同じ権限は 1 回のみ付与)
+-   FOREIGN KEY: `user_id` REFERENCES `users(id)` ON DELETE CASCADE
 -   FOREIGN KEY: `permission_id` REFERENCES `permissions(id)` ON DELETE CASCADE
--   INDEX: `role_id`
+-   INDEX: `user_id`
 -   INDEX: `permission_id`
 
 ---
@@ -151,14 +142,14 @@ Soccer Note アプリケーションのデータベース設計ドキュメン�
 
 #### team_user (チームとユーザーの関係)
 
-| カラム名   | 型        | NULL | デフォルト     | 説明                   |
-| ---------- | --------- | ---- | -------------- | ---------------------- |
-| id         | bigint    | NO   | AUTO_INCREMENT | 主キー                 |
-| team_id    | bigint    | NO   | -              | チーム ID (外部キー)   |
-| user_id    | bigint    | NO   | -              | ユーザー ID (外部キー) |
-| role_id    | bigint    | NO   | -              | ロール ID (外部キー)   |
-| created_at | timestamp | YES  | NULL           | 作成日時               |
-| updated_at | timestamp | YES  | NULL           | 更新日時               |
+| カラム名   | 型        | NULL | デフォルト     | 説明                                             |
+| ---------- | --------- | ---- | -------------- | ------------------------------------------------ |
+| id         | bigint    | NO   | AUTO_INCREMENT | 主キー                                           |
+| team_id    | bigint    | NO   | -              | チーム ID (外部キー)                             |
+| user_id    | bigint    | NO   | -              | ユーザー ID (外部キー)                           |
+| is_owner   | boolean   | NO   | false          | オーナーフラグ (true: オーナー, false: メンバー) |
+| created_at | timestamp | YES  | NULL           | 作成日時                                         |
+| updated_at | timestamp | YES  | NULL           | 更新日時                                         |
 
 **インデックス**
 
@@ -166,10 +157,14 @@ Soccer Note アプリケーションのデータベース設計ドキュメン�
 -   UNIQUE: `(team_id, user_id)` (同じチームに同じユーザーは 1 回のみ所属)
 -   FOREIGN KEY: `team_id` REFERENCES `teams(id)` ON DELETE CASCADE
 -   FOREIGN KEY: `user_id` REFERENCES `users(id)` ON DELETE CASCADE
--   FOREIGN KEY: `role_id` REFERENCES `roles(id)` ON DELETE RESTRICT
 -   INDEX: `team_id`
 -   INDEX: `user_id`
--   INDEX: `role_id`
+-   INDEX: `is_owner`
+
+**制約**
+
+-   1 つのチームには必ず 1 人以上のオーナーが必要（アプリケーションレベルで制御）
+-   オーナーを削除する場合は、別のメンバーをオーナーに昇格させる必要がある
 
 ---
 
@@ -297,21 +292,21 @@ Soccer Note アプリケーションのデータベース設計ドキュメン�
      │ N            │
 ┌────┴─────┐       │         ┌─────────────┐
 │  groups  │───┐   │         │ team_user   │
-└────┬─────┘   │   │         └──────┬──────┘
-     │ 1       │   │                │
-     │         │   │          ┌─────┴──────┐
-     │ N       │   │          │   roles    │
-┌────┴──────┐ │   │          └──────┬─────┘
-│group_user │ │   │                 │
-└─────┬─────┘ │   │           ┌─────┴──────────┐
-      │       │   │           │role_permissions│
-      │       │   │           └──────┬─────────┘
-      │       │   │                  │
-┌─────┴─────┐ │   │           ┌──────┴──────┐
-│   users   │─┼───┼───┐       │ permissions │
-└─────┬─────┘ │   │   │       └─────────────┘
-      │ 1     │   │   │
-      │       │   │   │
+└────┬─────┘   │   │         │ (is_owner)  │
+     │ 1       │   │         └──────┬──────┘
+     │         │   │                │
+     │ N       │   │                │
+┌────┴──────┐ │   │          ┌─────┴─────┐
+│group_user │ │   │          │   users   │
+└─────┬─────┘ │   │          └─────┬─────┘
+      │       │   │                │
+      │       │   │          ┌─────┴──────────┐
+      │       │   │          │user_permissions│
+┌─────┴─────┐ │   │          └──────┬─────────┘
+│   users   │─┼───┼───┐             │
+└─────┬─────┘ │   │   │       ┌──────┴──────┐
+      │ 1     │   │   │       │ permissions │
+      │       │   │   │       └─────────────┘
       │ N     │   │   │
 ┌─────┴─────┐ │   │   │
 │   notes   │ │   │   │
@@ -347,9 +342,9 @@ Soccer Note アプリケーションのデータベース設計ドキュメン�
 
 ### 多対多の関係
 
--   Team (N) ↔ User (N) (team_user テーブル経由)
+-   Team (N) ↔ User (N) (team_user テーブル経由、is_owner フラグで区別)
 -   Group (N) ↔ User (N) (group_user テーブル経由)
--   Role (N) ↔ Permission (N) (role_permissions テーブル経由)
+-   User (N) ↔ Permission (N) (user_permissions テーブル経由)
 
 ### 中間テーブルによる紐付け
 
@@ -369,21 +364,21 @@ $user = User::find(1);
 $teams = $user->teams; // team_user テーブル経由
 ```
 
-### ユースケース 2: チーム内のコーチ一覧を取得
+### ユースケース 2: チーム内のオーナー一覧を取得
 
 ```php
 $team = Team::find(1);
-$coaches = $team->users()->wherePivot('role_id', Role::where('name', 'coach')->first()->id)->get();
+$owners = $team->users()->wherePivot('is_owner', true)->get();
 ```
 
 ### ユースケース 3: ユーザーの権限チェック
 
 ```php
 $user = User::find(1);
-$team = Team::find(1);
-$teamUser = TeamUser::where('user_id', $user->id)->where('team_id', $team->id)->first();
-$role = $teamUser->role;
-$hasPermission = $role->permissions->contains('name', 'edit_notes');
+$hasPermission = $user->permissions->contains('name', 'edit_notes');
+
+// または
+$hasPermission = $user->hasPermission('edit_notes');
 ```
 
 ### ユースケース 4: チームノートの作成
@@ -429,23 +424,78 @@ if ($note->userNote) {
 }
 ```
 
+### ユースケース 7: チームオーナーの確認
+
+```php
+$team = Team::find(1);
+$user = User::find(1);
+$teamUser = TeamUser::where('team_id', $team->id)
+    ->where('user_id', $user->id)
+    ->first();
+
+$isOwner = $teamUser && $teamUser->is_owner;
+```
+
+### ユースケース 8: ユーザーに権限を付与
+
+```php
+$user = User::find(1);
+$permission = Permission::where('name', 'edit_notes')->first();
+
+UserPermission::create([
+    'user_id' => $user->id,
+    'permission_id' => $permission->id,
+]);
+
+// または Eloquent のリレーション経由で
+$user->permissions()->attach($permission->id);
+```
+
 ## マイグレーション実行順序
 
-1. `roles` テーブル
-2. `permissions` テーブル
-3. `role_permissions` テーブル
-4. `teams` テーブル
-5. `groups` テーブル
-6. `team_user` テーブル
-7. `group_user` テーブル
-8. `notes` テーブルの拡張 (既存テーブルの場合は ALTER)
-9. `user_notes` テーブル
-10. `team_notes` テーブル
-11. `group_notes` テーブル
+1. `permissions` テーブル
+2. `user_permissions` テーブル
+3. `teams` テーブル
+4. `groups` テーブル
+5. `team_user` テーブル (is_owner カラム追加)
+6. `group_user` テーブル
+7. `notes` テーブルの拡張 (既存テーブルの場合は ALTER)
+8. `user_notes` テーブル
+9. `team_notes` テーブル
+10. `group_notes` テーブル
 
 ## 注意事項
 
--   外部キー制約により、参照されているレコードは削除できない (role_id は ON DELETE RESTRICT)
 -   チームやグループを削除すると、関連する中間テーブルのレコードも削除される (ON DELETE CASCADE)
 -   ユーザーを削除すると、作成したノートも削除される
 -   同じチーム/グループに同じユーザーは重複して所属できない (UNIQUE 制約)
+-   チームには必ず 1 人以上のオーナーが必要（アプリケーションレベルで制御）
+-   最後のオーナーを削除する場合は、事前に別のメンバーをオーナーに昇格させる必要がある
+
+## 旧設計からの移行
+
+### 削除するテーブル
+
+-   `roles` テーブル
+-   `role_permissions` テーブル
+-   `user_roles` テーブル
+
+### 変更するテーブル
+
+-   `team_user` テーブル
+    -   `role_id` カラムを削除
+    -   `is_owner` カラムを追加 (boolean, デフォルト: false)
+
+### 新規追加するテーブル
+
+-   `user_permissions` テーブル
+
+### データ移行手順
+
+1. 既存の `team_user.role_id` から `is_owner` フラグを設定
+    - `role_id` が管理者ロールの場合は `is_owner = true`
+    - それ以外は `is_owner = false`
+2. 既存のロールに紐づく権限を、ユーザーに直接付与
+    - `user_roles` → `roles` → `role_permissions` → `permissions` のチェーンから権限を取得
+    - `user_permissions` テーブルに移行
+3. 旧テーブルを削除

@@ -7,7 +7,7 @@
 
 -   ダッシュボード統計情報の取得
 -   ユーザー管理（CRUD 操作）
--   ロール・権限管理（CRUD 操作）
+-   権限管理（CRUD 操作）
 -   システム設定
 -   活動ログの閲覧
 
@@ -20,8 +20,21 @@
 
 ### 認可
 
--   システム管理者（system_admin）ロールを持つユーザーのみアクセス可能
--   一般ユーザー（チーム管理者/コーチ/選手）は管理 API にアクセス不可
+-   システム管理者（system_admin）権限を持つユーザーのみアクセス可能
+-   一般ユーザー（チームメンバー）は管理 API にアクセス不可
+
+## 権限設計の変更点
+
+### 旧設計（ロールベース）からの変更
+
+-   **旧**: ロール（admin, coach, player など）を定義し、ロールに権限を紐付け、ユーザーにロールを付与
+-   **新**: ユーザーに直接権限を付与するシンプルな構造
+
+### 新設計の特徴
+
+-   `roles` テーブル、`role_permissions` テーブル、`user_roles` テーブルは削除
+-   `user_permissions` テーブルでユーザーと権限を直接紐付け
+-   チームオーナーは `team_user.is_owner` フラグで管理
 
 ## API エンドポイント設計
 
@@ -119,8 +132,8 @@
 -   `group_updated`: グループ更新
 -   `group_deleted`: グループ削除
 -   `note_created`: ノート作成
--   `role_assigned`: ロール割り当て
--   `permission_changed`: 権限変更
+-   `permission_assigned`: 権限割り当て
+-   `permission_revoked`: 権限剥奪
 
 ---
 
@@ -156,7 +169,8 @@
             "updated_at": "2025-01-10T10:00:00Z",
             "deleted_at": null,
             "teams_count": 2,
-            "notes_count": 15
+            "notes_count": 15,
+            "permissions_count": 5
         }
     ],
     "meta": {
@@ -191,11 +205,7 @@
             "id": 1,
             "sqid": "aBc12DeF",
             "name": "FCトーキョー",
-            "role": {
-                "id": 1,
-                "name": "admin",
-                "display_name": "管理者"
-            }
+            "is_owner": true
         }
     ],
     "groups": [
@@ -204,6 +214,18 @@
             "sqid": "gHi78JkL",
             "name": "Aチーム",
             "team_name": "FCトーキョー"
+        }
+    ],
+    "permissions": [
+        {
+            "id": 1,
+            "name": "view_notes",
+            "display_name": "ノート閲覧"
+        },
+        {
+            "id": 2,
+            "name": "create_notes",
+            "display_name": "ノート作成"
         }
     ],
     "notes_count": 15,
@@ -224,6 +246,7 @@
     "name": "山田太郎",
     "email": "yamada@example.com",
     "password": "SecurePassword123!",
+    "permission_ids": [1, 2, 3],
     "send_welcome_email": true
 }
 ```
@@ -252,7 +275,8 @@
 {
     "name": "山田太郎",
     "email": "yamada@example.com",
-    "password": "NewPassword123!" // オプション
+    "password": "NewPassword123!",
+    "permission_ids": [1, 2, 3, 4]
 }
 ```
 
@@ -300,85 +324,16 @@
 }
 ```
 
----
+#### 2.7 ユーザー権限の更新
 
-### 3. ロール・権限管理 API
+**エンドポイント**: `PUT /api/v1/admin/users/{sqid}/permissions`
 
-#### 3.1 ロール一覧取得
-
-**エンドポイント**: `GET /api/v1/admin/roles`
-
-**概要**: 全ロールの一覧を取得
-
-**クエリパラメータ**:
-
--   `include_permissions`: 権限情報を含めるか（`true` / `false`）デフォルト: `false`
-
-**レスポンス**:
-
-```json
-{
-    "data": [
-        {
-            "id": 1,
-            "name": "admin",
-            "display_name": "管理者",
-            "description": "チームの管理者",
-            "users_count": 25,
-            "permissions": [
-                {
-                    "id": 1,
-                    "name": "view_notes",
-                    "display_name": "ノート閲覧",
-                    "description": "ノートを閲覧できる"
-                }
-            ]
-        }
-    ]
-}
-```
-
-#### 3.2 ロール詳細取得
-
-**エンドポイント**: `GET /api/v1/admin/roles/{id}`
-
-**概要**: 特定ロールの詳細情報を取得
-
-**レスポンス**:
-
-```json
-{
-    "id": 1,
-    "name": "admin",
-    "display_name": "管理者",
-    "description": "チームの管理者",
-    "users_count": 25,
-    "permissions": [
-        {
-            "id": 1,
-            "name": "view_notes",
-            "display_name": "ノート閲覧",
-            "description": "ノートを閲覧できる"
-        }
-    ],
-    "created_at": "2025-01-01T00:00:00Z",
-    "updated_at": "2025-01-15T10:00:00Z"
-}
-```
-
-#### 3.3 ロール作成
-
-**エンドポイント**: `POST /api/v1/admin/roles`
-
-**概要**: 新規ロールを作成
+**概要**: ユーザーの権限を更新
 
 **リクエストボディ**:
 
 ```json
 {
-    "name": "manager",
-    "display_name": "マネージャー",
-    "description": "チームのマネージャー",
     "permission_ids": [1, 2, 3, 5, 7]
 }
 ```
@@ -387,61 +342,35 @@
 
 ```json
 {
-    "id": 4,
-    "name": "manager",
-    "display_name": "マネージャー",
-    "description": "チームのマネージャー",
-    "created_at": "2025-01-15T10:00:00Z"
+    "message": "権限を更新しました",
+    "permissions": [
+        {
+            "id": 1,
+            "name": "view_notes",
+            "display_name": "ノート閲覧"
+        },
+        {
+            "id": 2,
+            "name": "create_notes",
+            "display_name": "ノート作成"
+        }
+    ]
 }
 ```
 
-#### 3.4 ロール更新
+---
 
-**エンドポイント**: `PUT /api/v1/admin/roles/{id}`
+### 3. 権限管理 API
 
-**概要**: ロール情報を更新
-
-**リクエストボディ**:
-
-```json
-{
-    "display_name": "マネージャー",
-    "description": "チームのマネージャー",
-    "permission_ids": [1, 2, 3, 5, 7, 8]
-}
-```
-
-**レスポンス**:
-
-```json
-{
-    "id": 4,
-    "name": "manager",
-    "display_name": "マネージャー",
-    "description": "チームのマネージャー",
-    "updated_at": "2025-01-15T11:00:00Z"
-}
-```
-
-#### 3.5 ロール削除
-
-**エンドポイント**: `DELETE /api/v1/admin/roles/{id}`
-
-**概要**: ロールを削除（使用中のロールは削除不可）
-
-**レスポンス**:
-
-```json
-{
-    "message": "ロールを削除しました"
-}
-```
-
-#### 3.6 権限一覧取得
+#### 3.1 権限一覧取得
 
 **エンドポイント**: `GET /api/v1/admin/permissions`
 
 **概要**: 全権限の一覧を取得
+
+**クエリパラメータ**:
+
+-   `category`: カテゴリーフィルタ（`note`, `team`, `group`, `member`）
 
 **レスポンス**:
 
@@ -453,14 +382,16 @@
             "name": "view_notes",
             "display_name": "ノート閲覧",
             "description": "ノートを閲覧できる",
-            "category": "note"
+            "category": "note",
+            "users_count": 120
         },
         {
             "id": 2,
             "name": "create_notes",
             "display_name": "ノート作成",
             "description": "ノートを作成できる",
-            "category": "note"
+            "category": "note",
+            "users_count": 85
         }
     ]
 }
@@ -472,6 +403,109 @@
 -   `team`: チーム関連
 -   `group`: グループ関連
 -   `member`: メンバー関連
+-   `system`: システム関連
+
+#### 3.2 権限詳細取得
+
+**エンドポイント**: `GET /api/v1/admin/permissions/{id}`
+
+**概要**: 特定権限の詳細情報を取得
+
+**レスポンス**:
+
+```json
+{
+    "id": 1,
+    "name": "view_notes",
+    "display_name": "ノート閲覧",
+    "description": "ノートを閲覧できる",
+    "category": "note",
+    "users_count": 120,
+    "users": [
+        {
+            "id": 1,
+            "sqid": "xYz34WvU",
+            "name": "山田太郎",
+            "email": "yamada@example.com"
+        }
+    ],
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-15T10:00:00Z"
+}
+```
+
+#### 3.3 権限作成
+
+**エンドポイント**: `POST /api/v1/admin/permissions`
+
+**概要**: 新規権限を作成
+
+**リクエストボディ**:
+
+```json
+{
+    "name": "export_reports",
+    "display_name": "レポート出力",
+    "description": "レポートをエクスポートできる",
+    "category": "system"
+}
+```
+
+**レスポンス**:
+
+```json
+{
+    "id": 15,
+    "name": "export_reports",
+    "display_name": "レポート出力",
+    "description": "レポートをエクスポートできる",
+    "category": "system",
+    "created_at": "2025-01-15T10:00:00Z"
+}
+```
+
+#### 3.4 権限更新
+
+**エンドポイント**: `PUT /api/v1/admin/permissions/{id}`
+
+**概要**: 権限情報を更新
+
+**リクエストボディ**:
+
+```json
+{
+    "display_name": "レポート出力",
+    "description": "レポートをエクスポートできる権限",
+    "category": "system"
+}
+```
+
+**レスポンス**:
+
+```json
+{
+    "id": 15,
+    "name": "export_reports",
+    "display_name": "レポート出力",
+    "description": "レポートをエクスポートできる権限",
+    "category": "system",
+    "updated_at": "2025-01-15T11:00:00Z"
+}
+```
+
+#### 3.5 権限削除
+
+**エンドポイント**: `DELETE /api/v1/admin/permissions/{id}`
+
+**概要**: 権限を削除（使用中の権限は削除不可）
+
+**レスポンス**:
+
+```json
+{
+    "message": "権限を削除しました"
+}
+```
 
 ---
 
@@ -579,7 +613,6 @@
 追加カラム:
 
 -   `last_login_at`: 最終ログイン日時（TIMESTAMP, NULL）
--   `is_system_admin`: システム管理者フラグ（BOOLEAN, デフォルト: false）
 
 ---
 
@@ -605,12 +638,13 @@
 
 ### Phase 3
 
-5. ロール・権限管理 API
-    - `GET /api/v1/admin/roles`
+5. 権限管理 API
     - `GET /api/v1/admin/permissions`
-    - `POST /api/v1/admin/roles`
-    - `PUT /api/v1/admin/roles/{id}`
-    - `DELETE /api/v1/admin/roles/{id}`
+    - `GET /api/v1/admin/permissions/{id}`
+    - `POST /api/v1/admin/permissions`
+    - `PUT /api/v1/admin/permissions/{id}`
+    - `DELETE /api/v1/admin/permissions/{id}`
+    - `PUT /api/v1/admin/users/{sqid}/permissions`
 
 ### Phase 4
 
@@ -625,7 +659,7 @@
 
 ### 認可チェック
 
--   すべてのエンドポイントで `is_system_admin` フラグをチェック
+-   すべてのエンドポイントで `system_admin` 権限をチェック
 -   Middleware で一元管理（`EnsureSystemAdmin` ミドルウェア作成）
 
 ### ログ記録
@@ -721,3 +755,23 @@
 -   日時は ISO 8601 形式（UTC）
 -   ページネーションは Laravel の標準形式を使用
 -   OpenAPI（Swagger）ドキュメントを自動生成
+
+## 旧設計からの変更点まとめ
+
+### 削除された概念
+
+-   **ロール（roles）**: ユーザーに直接権限を付与するため不要
+-   **ロール権限紐付け（role_permissions）**: 不要
+-   **ユーザーロール紐付け（user_roles）**: 不要
+
+### 新設計での権限管理
+
+-   ユーザーは `user_permissions` テーブル経由で直接権限を持つ
+-   チームオーナーは `team_user.is_owner` フラグで識別
+-   権限の付与・剥奪は `user_permissions` テーブルで管理
+
+### API の変更点
+
+-   ロール関連のエンドポイント（`/api/v1/admin/roles`）を削除
+-   権限管理エンドポイント（`/api/v1/admin/permissions`）を追加
+-   ユーザー権限更新エンドポイント（`PUT /api/v1/admin/users/{sqid}/permissions`）を追加
