@@ -23,7 +23,6 @@ class AuthenticatedTest extends TestCase
                 'id',
                 'name',
                 'email',
-                'roles',
             ])
             ->assertJson([
                 'id' => $user->id,

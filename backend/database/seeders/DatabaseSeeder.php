@@ -14,10 +14,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 権限とロールのシード
+        // 権限のシード
         $this->call([
             PermissionSeeder::class,
-            RoleSeeder::class,
             UserSeeder::class,
         ]);
 

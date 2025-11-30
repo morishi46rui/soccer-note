@@ -21,7 +21,6 @@ class PermissionControllerTest extends TestCase
 
         // シーダーを実行して権限を作成
         $this->seed(\Database\Seeders\PermissionSeeder::class);
-        $this->seed(\Database\Seeders\RoleSeeder::class);
     }
 
     public function test_it_returns_all_permissions(): void

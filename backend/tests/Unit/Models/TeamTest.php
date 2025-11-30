@@ -35,25 +35,25 @@ class TeamTest extends TestCase
     {
         $team = Team::factory()->create();
         $user = User::factory()->create();
-        $role = \App\Models\Role::factory()->create();
 
-        $team->users()->attach($user->id, ['role_id' => $role->id]);
+        $team->users()->attach($user->id, ['is_owner' => false]);
 
         $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $team->users);
         $this->assertCount(1, $team->users);
         $this->assertInstanceOf(User::class, $team->users->first());
     }
 
-    public function test_it_has_pivot_data_with_role_id(): void
+    public function test_it_has_pivot_data_with_is_owner(): void
     {
         $team = Team::factory()->create();
         $user = User::factory()->create();
-        $role = \App\Models\Role::factory()->create();
 
-        $team->users()->attach($user->id, ['role_id' => $role->id]);
+        $team->users()->attach($user->id, ['is_owner' => true]);
 
+        // リレーションをリロード
+        $team->load('users');
         $teamUser = $team->users->first();
-        $this->assertEquals($role->id, $teamUser->pivot->role_id);
+        $this->assertTrue($teamUser->pivot->is_owner);
         $this->assertNotNull($teamUser->pivot->created_at);
         $this->assertNotNull($teamUser->pivot->updated_at);
     }

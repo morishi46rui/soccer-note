@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id()->comment('主キー');
             $table->foreignId('team_id')->constrained()->onDelete('cascade')->comment('チームID');
             $table->foreignId('user_id')->constrained()->onDelete('cascade')->comment('ユーザーID');
-            $table->foreignId('role_id')->constrained()->onDelete('restrict')->comment('ロールID');
+            $table->boolean('is_owner')->default(false)->comment('オーナーフラグ');
             $table->timestamps();
 
             $table->unique(['team_id', 'user_id']);
             $table->index('team_id');
             $table->index('user_id');
-            $table->index('role_id');
+            $table->index('is_owner');
         });
     }
 

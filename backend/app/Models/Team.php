@@ -39,7 +39,8 @@ class Team extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'team_user')
-            ->withPivot('role_id')
+            ->using(TeamUser::class)
+            ->withPivot('is_owner')
             ->withTimestamps();
     }
 }
