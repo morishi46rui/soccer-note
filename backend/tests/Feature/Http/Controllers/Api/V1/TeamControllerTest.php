@@ -239,4 +239,334 @@ class TeamControllerTest extends TestCase
         // Assert
         $response->assertNotFound();
     }
+
+    public function test_it_adds_a_user_to_team(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+        $userToAdd = User::factory()->create();
+        $data = [
+            'email' => $userToAdd->email,
+            'is_owner' => false,
+        ];
+
+        // Act
+        $response = $this->actingAs($this->user)->postJson("/api/v1/teams/{$team->sqid}/users", $data);
+
+        // Assert
+        $response->assertCreated()
+            ->assertJsonFragment([
+                'team_id' => $team->id,
+                'user_id' => $userToAdd->id,
+                'is_owner' => false,
+            ]);
+
+        $this->assertDatabaseHas('team_user', [
+            'team_id' => $team->id,
+            'user_id' => $userToAdd->id,
+            'is_owner' => false,
+        ]);
+    }
+
+    public function test_it_adds_a_user_to_team_as_owner(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+        $userToAdd = User::factory()->create();
+        $data = [
+            'email' => $userToAdd->email,
+            'is_owner' => true,
+        ];
+
+        // Act
+        $response = $this->actingAs($this->user)->postJson("/api/v1/teams/{$team->sqid}/users", $data);
+
+        // Assert
+        $response->assertCreated()
+            ->assertJsonFragment([
+                'team_id' => $team->id,
+                'user_id' => $userToAdd->id,
+                'is_owner' => true,
+            ]);
+
+        $this->assertDatabaseHas('team_user', [
+            'team_id' => $team->id,
+            'user_id' => $userToAdd->id,
+            'is_owner' => true,
+        ]);
+    }
+
+    public function test_it_returns_422_when_user_already_exists_in_team(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+        $userToAdd = User::factory()->create();
+
+        // 事前にユーザーをチームに登録
+        $team->users()->attach($userToAdd->id, ['is_owner' => false]);
+
+        $data = [
+            'email' => $userToAdd->email,
+            'is_owner' => false,
+        ];
+
+        // Act
+        $response = $this->actingAs($this->user)->postJson("/api/v1/teams/{$team->sqid}/users", $data);
+
+        // Assert
+        $response->assertUnprocessable()
+            ->assertJsonFragment([
+                'message' => 'ユーザーが見つからないか、すでにチームに登録されています',
+            ]);
+    }
+
+    public function test_it_returns_404_when_adding_user_to_non_existent_team(): void
+    {
+        // Arrange
+        $userToAdd = User::factory()->create();
+        $data = [
+            'email' => $userToAdd->email,
+            'is_owner' => false,
+        ];
+
+        // Act
+        $response = $this->actingAs($this->user)->postJson('/api/v1/teams/invalid-sqid/users', $data);
+
+        // Assert
+        $response->assertNotFound();
+    }
+
+    public function test_it_validates_required_fields_when_adding_user(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+
+        // Act
+        $response = $this->actingAs($this->user)->postJson("/api/v1/teams/{$team->sqid}/users", []);
+
+        // Assert
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['email']);
+    }
+
+    public function test_it_validates_user_exists_when_adding_user(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+        $data = [
+            'email' => 'nonexistent@example.com', // 存在しないメールアドレス
+            'is_owner' => false,
+        ];
+
+        // Act
+        $response = $this->actingAs($this->user)->postJson("/api/v1/teams/{$team->sqid}/users", $data);
+
+        // Assert
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['email']);
+    }
+
+    public function test_it_requires_authentication_for_adding_user(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+        $userToAdd = User::factory()->create();
+        $data = [
+            'email' => $userToAdd->email,
+            'is_owner' => false,
+        ];
+
+        // Act
+        $response = $this->postJson("/api/v1/teams/{$team->sqid}/users", $data);
+
+        // Assert
+        $response->assertUnauthorized();
+    }
+
+    public function test_it_returns_team_users(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+
+        $team->users()->attach($user1->id, ['is_owner' => true]);
+        $team->users()->attach($user2->id, ['is_owner' => false]);
+
+        // Act
+        $response = $this->actingAs($this->user)->getJson("/api/v1/teams/{$team->sqid}/users");
+
+        // Assert
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'sqid', 'name', 'email', 'is_owner', 'created_at'],
+                ],
+            ])
+            ->assertJsonCount(2, 'data');
+    }
+
+    public function test_it_returns_empty_array_when_no_users_in_team(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+
+        // Act
+        $response = $this->actingAs($this->user)->getJson("/api/v1/teams/{$team->sqid}/users");
+
+        // Assert
+        $response->assertOk()
+            ->assertJsonCount(0, 'data');
+    }
+
+    public function test_it_returns_404_when_getting_users_for_non_existent_team(): void
+    {
+        // Act
+        $response = $this->actingAs($this->user)->getJson('/api/v1/teams/invalid-sqid/users');
+
+        // Assert
+        $response->assertNotFound();
+    }
+
+    public function test_it_requires_authentication_for_getting_users(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+
+        // Act
+        $response = $this->getJson("/api/v1/teams/{$team->sqid}/users");
+
+        // Assert
+        $response->assertUnauthorized();
+    }
+
+    public function test_it_updates_team_user(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+        $userToUpdate = User::factory()->create();
+        $team->users()->attach($userToUpdate->id, ['is_owner' => false]);
+
+        $data = [
+            'is_owner' => true,
+        ];
+
+        // Act
+        $response = $this->actingAs($this->user)->putJson("/api/v1/teams/{$team->sqid}/users/{$userToUpdate->id}", $data);
+
+        // Assert
+        $response->assertOk()
+            ->assertJsonFragment([
+                'team_id' => $team->id,
+                'user_id' => $userToUpdate->id,
+                'is_owner' => true,
+            ]);
+
+        $this->assertDatabaseHas('team_user', [
+            'team_id' => $team->id,
+            'user_id' => $userToUpdate->id,
+            'is_owner' => true,
+        ]);
+    }
+
+    public function test_it_returns_404_when_updating_non_existent_user_in_team(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+        $userNotInTeam = User::factory()->create();
+
+        $data = [
+            'is_owner' => true,
+        ];
+
+        // Act
+        $response = $this->actingAs($this->user)->putJson("/api/v1/teams/{$team->sqid}/users/{$userNotInTeam->id}", $data);
+
+        // Assert
+        $response->assertNotFound()
+            ->assertJsonFragment([
+                'message' => 'ユーザーがチームに登録されていません',
+            ]);
+    }
+
+    public function test_it_validates_required_fields_when_updating_user(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+        $userToUpdate = User::factory()->create();
+        $team->users()->attach($userToUpdate->id, ['is_owner' => false]);
+
+        // Act
+        $response = $this->actingAs($this->user)->putJson("/api/v1/teams/{$team->sqid}/users/{$userToUpdate->id}", []);
+
+        // Assert
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['is_owner']);
+    }
+
+    public function test_it_requires_authentication_for_updating_user(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+        $userToUpdate = User::factory()->create();
+        $team->users()->attach($userToUpdate->id, ['is_owner' => false]);
+
+        $data = [
+            'is_owner' => true,
+        ];
+
+        // Act
+        $response = $this->putJson("/api/v1/teams/{$team->sqid}/users/{$userToUpdate->id}", $data);
+
+        // Assert
+        $response->assertUnauthorized();
+    }
+
+    public function test_it_removes_user_from_team(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+        $userToRemove = User::factory()->create();
+        $team->users()->attach($userToRemove->id, ['is_owner' => false]);
+
+        // Act
+        $response = $this->actingAs($this->user)->deleteJson("/api/v1/teams/{$team->sqid}/users/{$userToRemove->id}");
+
+        // Assert
+        $response->assertNoContent();
+        $this->assertDatabaseMissing('team_user', [
+            'team_id' => $team->id,
+            'user_id' => $userToRemove->id,
+        ]);
+    }
+
+    public function test_it_returns_404_when_removing_non_existent_user_from_team(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+        $userNotInTeam = User::factory()->create();
+
+        // Act
+        $response = $this->actingAs($this->user)->deleteJson("/api/v1/teams/{$team->sqid}/users/{$userNotInTeam->id}");
+
+        // Assert
+        $response->assertNotFound()
+            ->assertJsonFragment([
+                'message' => 'ユーザーがチームに登録されていません',
+            ]);
+    }
+
+    public function test_it_requires_authentication_for_removing_user(): void
+    {
+        // Arrange
+        $team = Team::factory()->create();
+        $userToRemove = User::factory()->create();
+        $team->users()->attach($userToRemove->id, ['is_owner' => false]);
+
+        // Act
+        $response = $this->deleteJson("/api/v1/teams/{$team->sqid}/users/{$userToRemove->id}");
+
+        // Assert
+        $response->assertUnauthorized();
+    }
 }

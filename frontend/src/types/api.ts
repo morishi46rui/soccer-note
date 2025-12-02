@@ -288,26 +288,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/roles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * ロール一覧取得
-         * @description すべてのロールと関連する権限を取得します
-         */
-        get: operations["getRoles"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/teams": {
         parameters: {
             query?: never;
@@ -355,6 +335,54 @@ export interface paths {
          * @description 指定されたSqidのチームを削除します
          */
         delete: operations["deleteTeam"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/{sqid}/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * チームのユーザー一覧取得
+         * @description 指定されたSqidのチームに所属するユーザー一覧を取得します
+         */
+        get: operations["getTeamUsers"];
+        put?: never;
+        /**
+         * チームにユーザーを追加
+         * @description 指定されたSqidのチームにユーザーを追加します
+         */
+        post: operations["addUserToTeam"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/{sqid}/users/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * チームのユーザー情報を更新
+         * @description 指定されたSqidのチームに所属するユーザーの情報を更新します
+         */
+        put: operations["updateTeamUser"];
+        post?: never;
+        /**
+         * チームからユーザーを削除
+         * @description 指定されたSqidのチームからユーザーを削除します
+         */
+        delete: operations["removeUserFromTeam"];
         options?: never;
         head?: never;
         patch?: never;
@@ -429,6 +457,18 @@ export interface components {
             date: components["schemas"]["Note"]["date"];
             content: components["schemas"]["Note"]["content"];
         };
+        AddUserToTeamRequest: {
+            /**
+             * Format: int64
+             * @description ユーザーID
+             */
+            user_id: number;
+            /**
+             * @description オーナーフラグ
+             * @default false
+             */
+            is_owner: boolean;
+        };
         CreateTeamRequest: {
             name: components["schemas"]["Team"]["name"];
             description?: components["schemas"]["Team"]["description"];
@@ -436,6 +476,10 @@ export interface components {
         UpdateTeamRequest: {
             name?: components["schemas"]["Team"]["name"];
             description?: components["schemas"]["Team"]["description"];
+        };
+        UpdateTeamUserRequest: {
+            /** @description オーナーフラグ */
+            is_owner: boolean;
         };
         Group: {
             /**
@@ -525,34 +569,6 @@ export interface components {
             /** @description 表示名 */
             display_name?: string;
             /** @description 権限の説明 */
-            description?: string | null;
-            /**
-             * Format: date-time
-             * @description 作成日時
-             */
-            created_at?: string;
-            /**
-             * Format: date-time
-             * @description 更新日時
-             */
-            updated_at?: string;
-            /**
-             * Format: date-time
-             * @description 論理削除日時
-             */
-            deleted_at?: string | null;
-        };
-        Role: {
-            /**
-             * Format: int64
-             * @description ロールID
-             */
-            id?: number;
-            /** @description ロール識別子 */
-            name?: string;
-            /** @description 表示名 */
-            display_name?: string;
-            /** @description ロールの説明 */
             description?: string | null;
             /**
              * Format: date-time
@@ -664,11 +680,6 @@ export interface components {
             name?: components["schemas"]["User"]["name"];
             email?: components["schemas"]["User"]["email"];
             email_verified_at?: components["schemas"]["User"]["email_verified_at"];
-            roles?: {
-                id?: number;
-                name?: string;
-                display_name?: string;
-            }[];
             created_at?: components["schemas"]["User"]["created_at"];
             updated_at?: components["schemas"]["User"]["updated_at"];
         };
@@ -679,11 +690,6 @@ export interface components {
                 id?: components["schemas"]["User"]["id"];
                 name?: components["schemas"]["User"]["name"];
                 email?: components["schemas"]["User"]["email"];
-                roles?: {
-                    id?: number;
-                    name?: string;
-                    display_name?: string;
-                }[];
             };
         };
         LogoutResponse: {
@@ -805,6 +811,25 @@ export interface components {
             created_at?: components["schemas"]["Note"]["created_at"];
             updated_at?: components["schemas"]["Note"]["updated_at"];
         };
+        AddUserToTeamResponse: {
+            /**
+             * Format: int64
+             * @description チームID
+             */
+            team_id?: number;
+            /**
+             * Format: int64
+             * @description ユーザーID
+             */
+            user_id?: number;
+            /** @description オーナーフラグ */
+            is_owner?: boolean;
+            /**
+             * Format: date-time
+             * @description 作成日時
+             */
+            created_at?: string;
+        };
         CreateTeamResponse: {
             id?: components["schemas"]["Team"]["id"];
             sqid?: components["schemas"]["Team"]["sqid"];
@@ -820,6 +845,32 @@ export interface components {
             description?: components["schemas"]["Team"]["description"];
             created_at?: components["schemas"]["Team"]["created_at"];
             updated_at?: components["schemas"]["Team"]["updated_at"];
+        };
+        TeamUserItem: {
+            /**
+             * Format: int64
+             * @description ユーザーID
+             */
+            id?: number;
+            /** @description ユーザーSqid */
+            sqid?: string;
+            /** @description ユーザー名 */
+            name?: string;
+            /**
+             * Format: email
+             * @description メールアドレス
+             */
+            email?: string;
+            /** @description オーナーフラグ */
+            is_owner?: boolean;
+            /**
+             * Format: date-time
+             * @description 参加日時
+             */
+            created_at?: string;
+        };
+        GetTeamUsersResponse: {
+            data?: components["schemas"]["TeamUserItem"][];
         };
         GetTeamsResponse: {
             data?: {
@@ -846,6 +897,25 @@ export interface components {
             description?: components["schemas"]["Team"]["description"];
             created_at?: components["schemas"]["Team"]["created_at"];
             updated_at?: components["schemas"]["Team"]["updated_at"];
+        };
+        UpdateTeamUserResponse: {
+            /**
+             * Format: int64
+             * @description チームID
+             */
+            team_id?: number;
+            /**
+             * Format: int64
+             * @description ユーザーID
+             */
+            user_id?: number;
+            /** @description オーナーフラグ */
+            is_owner?: boolean;
+            /**
+             * Format: date-time
+             * @description 更新日時
+             */
+            updated_at?: string;
         };
     };
     responses: {
@@ -1468,83 +1538,6 @@ export interface operations {
             401: components["responses"]["401"];
         };
     };
-    getRoles: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description 取得成功 */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /**
-                         * Format: int64
-                         * @description ロールID
-                         * @example 1
-                         */
-                        id?: number;
-                        /**
-                         * @description ロール識別子
-                         * @example player
-                         */
-                        name?: string;
-                        /**
-                         * @description 表示名
-                         * @example 選手
-                         */
-                        display_name?: string;
-                        /**
-                         * @description ロールの説明
-                         * @example チームの選手
-                         */
-                        description?: string | null;
-                        /** @description このロールが持つ権限 */
-                        permissions?: {
-                            /**
-                             * Format: int64
-                             * @description 権限ID
-                             * @example 1
-                             */
-                            id?: number;
-                            /**
-                             * @description 権限識別子
-                             * @example view_notes
-                             */
-                            name?: string;
-                            /**
-                             * @description 表示名
-                             * @example ノート閲覧
-                             */
-                            display_name?: string;
-                            /**
-                             * @description 権限の説明
-                             * @example ノートを閲覧できる
-                             */
-                            description?: string | null;
-                        }[];
-                        /**
-                         * Format: date-time
-                         * @description 作成日時
-                         */
-                        created_at?: string;
-                        /**
-                         * Format: date-time
-                         * @description 更新日時
-                         */
-                        updated_at?: string;
-                    }[];
-                };
-            };
-            401: components["responses"]["401"];
-        };
-    };
     getTeams: {
         parameters: {
             query?: {
@@ -1659,6 +1652,118 @@ export interface operations {
             path: {
                 /** @description チームSqid */
                 sqid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 削除成功 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+        };
+    };
+    getTeamUsers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description チームSqid */
+                sqid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 取得成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetTeamUsersResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+        };
+    };
+    addUserToTeam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description チームSqid */
+                sqid: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddUserToTeamRequest"];
+            };
+        };
+        responses: {
+            /** @description 追加成功 */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AddUserToTeamResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            422: components["responses"]["422"];
+        };
+    };
+    updateTeamUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description チームSqid */
+                sqid: string;
+                /** @description ユーザーID */
+                userId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTeamUserRequest"];
+            };
+        };
+        responses: {
+            /** @description 更新成功 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UpdateTeamUserResponse"];
+                };
+            };
+            401: components["responses"]["401"];
+            404: components["responses"]["404"];
+            422: components["responses"]["422"];
+        };
+    };
+    removeUserFromTeam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description チームSqid */
+                sqid: string;
+                /** @description ユーザーID */
+                userId: number;
             };
             cookie?: never;
         };

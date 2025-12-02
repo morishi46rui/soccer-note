@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\V1\GroupController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\NoteController;
 use App\Http\Controllers\Api\V1\PermissionController;
-use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\TeamController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,11 +32,14 @@ Route::prefix('v1')->group(function () {
         Route::put('/notes/{sqid}', [NoteController::class, 'update']);
         Route::delete('/notes/{sqid}', [NoteController::class, 'destroy']);
         Route::get('/permissions', [PermissionController::class, 'index']);
-        Route::get('/roles', [RoleController::class, 'index']);
         Route::get('/teams', [TeamController::class, 'index']);
         Route::post('/teams', [TeamController::class, 'store']);
         Route::get('/teams/{sqid}', [TeamController::class, 'show']);
         Route::put('/teams/{sqid}', [TeamController::class, 'update']);
         Route::delete('/teams/{sqid}', [TeamController::class, 'destroy']);
+        Route::post('/teams/{sqid}/users', [TeamController::class, 'addUser']);
+        Route::get('/teams/{sqid}/users', [TeamController::class, 'getUsers']);
+        Route::put('/teams/{sqid}/users/{userId}', [TeamController::class, 'updateUser']);
+        Route::delete('/teams/{sqid}/users/{userId}', [TeamController::class, 'removeUser']);
     });
 });

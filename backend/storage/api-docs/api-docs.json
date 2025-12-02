@@ -792,104 +792,6 @@
                 ]
             }
         },
-        "/api/v1/roles": {
-            "get": {
-                "tags": [
-                    "Roles"
-                ],
-                "summary": "ロール一覧取得",
-                "description": "すべてのロールと関連する権限を取得します",
-                "operationId": "getRoles",
-                "responses": {
-                    "200": {
-                        "description": "取得成功",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "properties": {
-                                            "id": {
-                                                "description": "ロールID",
-                                                "type": "integer",
-                                                "format": "int64",
-                                                "example": 1
-                                            },
-                                            "name": {
-                                                "description": "ロール識別子",
-                                                "type": "string",
-                                                "example": "player"
-                                            },
-                                            "display_name": {
-                                                "description": "表示名",
-                                                "type": "string",
-                                                "example": "選手"
-                                            },
-                                            "description": {
-                                                "description": "ロールの説明",
-                                                "type": "string",
-                                                "example": "チームの選手",
-                                                "nullable": true
-                                            },
-                                            "permissions": {
-                                                "description": "このロールが持つ権限",
-                                                "type": "array",
-                                                "items": {
-                                                    "properties": {
-                                                        "id": {
-                                                            "description": "権限ID",
-                                                            "type": "integer",
-                                                            "format": "int64",
-                                                            "example": 1
-                                                        },
-                                                        "name": {
-                                                            "description": "権限識別子",
-                                                            "type": "string",
-                                                            "example": "view_notes"
-                                                        },
-                                                        "display_name": {
-                                                            "description": "表示名",
-                                                            "type": "string",
-                                                            "example": "ノート閲覧"
-                                                        },
-                                                        "description": {
-                                                            "description": "権限の説明",
-                                                            "type": "string",
-                                                            "example": "ノートを閲覧できる",
-                                                            "nullable": true
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "created_at": {
-                                                "description": "作成日時",
-                                                "type": "string",
-                                                "format": "date-time"
-                                            },
-                                            "updated_at": {
-                                                "description": "更新日時",
-                                                "type": "string",
-                                                "format": "date-time"
-                                            }
-                                        },
-                                        "type": "object"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/401"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
         "/api/v1/teams": {
             "get": {
                 "tags": [
@@ -1102,6 +1004,217 @@
                     }
                 ]
             }
+        },
+        "/api/v1/teams/{sqid}/users": {
+            "get": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "チームのユーザー一覧取得",
+                "description": "指定されたSqidのチームに所属するユーザー一覧を取得します",
+                "operationId": "getTeamUsers",
+                "parameters": [
+                    {
+                        "name": "sqid",
+                        "in": "path",
+                        "description": "チームSqid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "取得成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetTeamUsersResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "チームにユーザーを追加",
+                "description": "指定されたSqidのチームにユーザーを追加します",
+                "operationId": "addUserToTeam",
+                "parameters": [
+                    {
+                        "name": "sqid",
+                        "in": "path",
+                        "description": "チームSqid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddUserToTeamRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "追加成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AddUserToTeamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/teams/{sqid}/users/{userId}": {
+            "put": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "チームのユーザー情報を更新",
+                "description": "指定されたSqidのチームに所属するユーザーの情報を更新します",
+                "operationId": "updateTeamUser",
+                "parameters": [
+                    {
+                        "name": "sqid",
+                        "in": "path",
+                        "description": "チームSqid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ユーザーID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateTeamUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "更新成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdateTeamUserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "チームからユーザーを削除",
+                "description": "指定されたSqidのチームからユーザーを削除します",
+                "operationId": "removeUserFromTeam",
+                "parameters": [
+                    {
+                        "name": "sqid",
+                        "in": "path",
+                        "description": "チームSqid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ユーザーID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "削除成功"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -1260,6 +1373,24 @@
                 },
                 "type": "object"
             },
+            "AddUserToTeamRequest": {
+                "required": [
+                    "email"
+                ],
+                "properties": {
+                    "email": {
+                        "description": "ユーザーのメールアドレス",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "is_owner": {
+                        "description": "オーナーフラグ",
+                        "type": "boolean",
+                        "default": false
+                    }
+                },
+                "type": "object"
+            },
             "CreateTeamRequest": {
                 "required": [
                     "name"
@@ -1281,6 +1412,18 @@
                     },
                     "description": {
                         "$ref": "#/components/schemas/Team/properties/description"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateTeamUserRequest": {
+                "required": [
+                    "is_owner"
+                ],
+                "properties": {
+                    "is_owner": {
+                        "description": "オーナーフラグ",
+                        "type": "boolean"
                     }
                 },
                 "type": "object"
@@ -1396,45 +1539,6 @@
                     },
                     "description": {
                         "description": "権限の説明",
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "created_at": {
-                        "description": "作成日時",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updated_at": {
-                        "description": "更新日時",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "deleted_at": {
-                        "description": "論理削除日時",
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
-                    }
-                },
-                "type": "object"
-            },
-            "Role": {
-                "properties": {
-                    "id": {
-                        "description": "ロールID",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "name": {
-                        "description": "ロール識別子",
-                        "type": "string"
-                    },
-                    "display_name": {
-                        "description": "表示名",
-                        "type": "string"
-                    },
-                    "description": {
-                        "description": "ロールの説明",
                         "type": "string",
                         "nullable": true
                     },
@@ -1592,23 +1696,6 @@
                     "email_verified_at": {
                         "$ref": "#/components/schemas/User/properties/email_verified_at"
                     },
-                    "roles": {
-                        "type": "array",
-                        "items": {
-                            "properties": {
-                                "id": {
-                                    "type": "integer"
-                                },
-                                "name": {
-                                    "type": "string"
-                                },
-                                "display_name": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    },
                     "created_at": {
                         "$ref": "#/components/schemas/User/properties/created_at"
                     },
@@ -1634,23 +1721,6 @@
                             },
                             "email": {
                                 "$ref": "#/components/schemas/User/properties/email"
-                            },
-                            "roles": {
-                                "type": "array",
-                                "items": {
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer"
-                                        },
-                                        "name": {
-                                            "type": "string"
-                                        },
-                                        "display_name": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
                             }
                         },
                         "type": "object"
@@ -1984,6 +2054,30 @@
                 },
                 "type": "object"
             },
+            "AddUserToTeamResponse": {
+                "properties": {
+                    "team_id": {
+                        "description": "チームID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "user_id": {
+                        "description": "ユーザーID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "is_owner": {
+                        "description": "オーナーフラグ",
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "description": "作成日時",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "CreateTeamResponse": {
                 "properties": {
                     "id": {
@@ -2026,6 +2120,49 @@
                     },
                     "updated_at": {
                         "$ref": "#/components/schemas/Team/properties/updated_at"
+                    }
+                },
+                "type": "object"
+            },
+            "TeamUserItem": {
+                "properties": {
+                    "id": {
+                        "description": "ユーザーID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "sqid": {
+                        "description": "ユーザーSqid",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "ユーザー名",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "メールアドレス",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "is_owner": {
+                        "description": "オーナーフラグ",
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "description": "参加日時",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "GetTeamUsersResponse": {
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TeamUserItem"
+                        }
                     }
                 },
                 "type": "object"
@@ -2096,6 +2233,30 @@
                     },
                     "updated_at": {
                         "$ref": "#/components/schemas/Team/properties/updated_at"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateTeamUserResponse": {
+                "properties": {
+                    "team_id": {
+                        "description": "チームID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "user_id": {
+                        "description": "ユーザーID",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "is_owner": {
+                        "description": "オーナーフラグ",
+                        "type": "boolean"
+                    },
+                    "updated_at": {
+                        "description": "更新日時",
+                        "type": "string",
+                        "format": "date-time"
                     }
                 },
                 "type": "object"
@@ -2223,10 +2384,6 @@
         {
             "name": "Permissions",
             "description": "権限管理"
-        },
-        {
-            "name": "Roles",
-            "description": "ロール管理"
         },
         {
             "name": "Teams",
