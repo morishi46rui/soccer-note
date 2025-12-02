@@ -2,32 +2,29 @@
 
 import { DashboardLayout } from "@/components/dashboard-layout";
 import { useSnackbar } from "@/hooks/use-snackbar";
-import {
-  ArrowBack as ArrowBackIcon,
-  Delete as DeleteIcon,
-  Edit as EditIcon,
-} from "@mui/icons-material";
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Divider,
-  IconButton,
-  Stack,
-  Typography,
-} from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CircularProgress from "@mui/material/CircularProgress";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDeleteTeam } from "../api/delete-team";
 import { useGetTeam } from "../api/get-team";
+import { TeamUserList } from "./team-user-list";
 
 type TeamDetailProps = {
   sqid: string;
@@ -184,6 +181,9 @@ export const TeamDetail = ({ sqid }: TeamDetailProps) => {
               </Stack>
             </CardContent>
           </Card>
+
+          {/* Team Members */}
+          <TeamUserList sqid={sqid} />
         </Stack>
       </Box>
 

@@ -1,8 +1,11 @@
 "use client";
 
 import type { SnackbarMessage, SnackbarSeverity } from "@/types/snackbar";
-import { Alert, Snackbar } from "@mui/material";
-import { createContext, useState, type PropsWithChildren } from "react";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
+import { createContext } from "react";
+import { useState } from "react";
+import type { PropsWithChildren } from "react";
 
 type SnackbarContextValue = {
   showSnackbar: (message: string, severity?: SnackbarSeverity) => void;

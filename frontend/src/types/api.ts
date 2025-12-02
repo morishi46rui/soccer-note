@@ -459,10 +459,10 @@ export interface components {
         };
         AddUserToTeamRequest: {
             /**
-             * Format: int64
-             * @description ユーザーID
+             * Format: email
+             * @description ユーザーのメールアドレス
              */
-            user_id: number;
+            email: string;
             /**
              * @description オーナーフラグ
              * @default false
