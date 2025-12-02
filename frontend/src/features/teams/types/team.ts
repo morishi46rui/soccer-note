@@ -29,3 +29,22 @@ export type UpdateTeamFormProps = {
 export type CreateTeamFormValues = CreateTeamRequest;
 
 export type UpdateTeamFormValues = UpdateTeamRequest;
+
+export type TeamCardProps = {
+  team: Team;
+};
+
+export type ErrorStateProps = {
+  message: string;
+};
+
+export type EmptyStateProps = {
+  message: string;
+};
+
+export type TeamPaginationProps = {
+  currentPage: number;
+  lastPage: number;
+  total: number;
+  onPageChange: (page: number) => void;
+};
